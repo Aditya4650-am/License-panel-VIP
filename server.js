@@ -8,6 +8,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
+// Serve the main index.html page on the root URL
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 
 // Initialize SQLite database file
 const db = new sqlite3.Database('./database.db');
