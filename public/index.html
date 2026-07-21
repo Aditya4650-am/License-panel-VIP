@@ -4,20 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚡ ZENITSU VIP - Gamer Edition ⚡</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Three.js for true 3D Canvas Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
         :root {
-            --bg-dark: #050811;
-            --neon-cyan: #00f0ff;
-            --neon-purple: #7000ff;
-            --neon-pink: #ff007f;
+            --bg-dark: #03050c;
             --neon-gold: #ffaa00;
+            --neon-amber: #ffd700;
+            --neon-cyan: #00f0ff;
+            --neon-purple: #8000ff;
             --neon-green: #00ff66;
             --neon-red: #ff2a5f;
-            --glass-bg: rgba(10, 15, 29, 0.75);
-            --glass-border: rgba(0, 240, 255, 0.25);
+            
+            /* Custom Zenitsu Background Image - Ensure 6117533.jpg is in the same directory */
+            --bg-image-url: url('6117533.jpg');
+            
+            --glass-bg: rgba(8, 10, 20, 0.72);
+            --glass-border: rgba(255, 170, 0, 0.35);
             --text-main: #f0f6fc;
-            --text-muted: #8b949e;
+            --text-muted: #a3b3c2;
         }
 
         * {
@@ -25,94 +33,105 @@
             margin: 0;
             padding: 0;
             font-family: 'Rajdhani', sans-serif;
-            transition: all 0.25s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease-out;
         }
 
         body {
             background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at center, rgba(3, 5, 12, 0.5) 0%, rgba(3, 5, 12, 0.95) 100%),
+                var(--bg-image-url);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
-            padding: 25px 15px;
+            padding: 30px 15px;
             overflow-x: hidden;
             position: relative;
         }
 
-        /* 3D Animated Background Canvas */
-        #bgCanvas {
+        /* 3D Animated Canvas Overlay */
+        #threeCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -1;
+            z-index: 0;
             pointer-events: none;
         }
 
         .container {
-            max-width: 1050px;
+            max-width: 1100px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
+            perspective: 1200px;
         }
 
         /* Header & Title Effects */
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--neon-cyan) 0%, #8b5cf6 50%, var(--neon-pink) 100%);
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--neon-amber) 0%, var(--neon-gold) 50%, #ffffff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
-            animation: pulseGlow 3s infinite alternate;
+            text-shadow: 0 0 35px rgba(255, 170, 0, 0.6);
+            animation: thunderPulse 2.5s infinite alternate;
         }
 
-        @keyframes pulseGlow {
-            0% { filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3)); }
-            100% { filter: drop-shadow(0 0 25px rgba(112, 0, 255, 0.7)); }
+        @keyframes thunderPulse {
+            0% { filter: drop-shadow(0 0 10px rgba(255, 170, 0, 0.4)); }
+            100% { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9)); }
         }
 
         .live-clock {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            margin-top: 12px;
-            padding: 6px 20px;
+            margin-top: 14px;
+            padding: 8px 22px;
             background: rgba(5, 8, 17, 0.85);
-            border: 1px solid var(--neon-cyan);
+            border: 1px solid var(--neon-gold);
             border-radius: 30px;
-            color: var(--neon-cyan);
+            color: var(--neon-amber);
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
             font-weight: 700;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.25), inset 0 0 10px rgba(255, 170, 0, 0.15);
         }
 
-        /* Stats Cards - Gamer Style */
+        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 22px;
             text-align: center;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            transform-style: preserve-3d;
         }
 
         .stat-card::before {
@@ -122,8 +141,8 @@
             left: -100%;
             width: 100%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-            animation: borderSlide 3s infinite linear;
+            background: linear-gradient(90deg, transparent, var(--neon-amber), transparent);
+            animation: borderSlide 2.5s infinite linear;
         }
 
         @keyframes borderSlide {
@@ -141,116 +160,121 @@
 
         .stat-card p {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 900;
             color: #fff;
             margin-top: 6px;
-            text-shadow: 0 0 12px var(--neon-cyan);
+            text-shadow: 0 0 15px var(--neon-gold);
         }
 
-        /* 3D Glassmorphism Cards */
+        /* 3D Dynamic Interactive Cards */
         .card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 25px;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            transform: perspective(1000px) rotateX(0deg);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transform-style: preserve-3d;
+            will-change: transform;
         }
 
         .card:hover {
-            border-color: rgba(0, 240, 255, 0.5);
-            box-shadow: 0 20px 45px rgba(0, 240, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 215, 0, 0.7);
+            box-shadow: 0 25px 50px rgba(255, 170, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .card h2 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.25rem;
-            color: var(--neon-cyan);
-            margin-bottom: 18px;
+            font-size: 1.35rem;
+            color: var(--neon-amber);
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
             letter-spacing: 1px;
+            text-shadow: 0 0 12px rgba(255, 170, 0, 0.4);
         }
 
-        /* Inputs & Form Controls */
+        /* Form Controls */
         label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-muted);
-            margin-top: 12px;
+            margin-top: 14px;
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 13px 16px;
-            margin-bottom: 14px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
             background: rgba(5, 8, 17, 0.85);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 10px;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 12px;
             color: #fff;
             font-size: 15px;
             font-weight: 600;
             outline: none;
+            backdrop-filter: blur(5px);
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            border-color: var(--neon-amber);
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
             background: rgba(10, 15, 29, 0.95);
         }
 
         textarea {
-            height: 120px;
+            height: 130px;
             font-family: 'JetBrains Mono', monospace;
             resize: vertical;
         }
 
-        /* 3D Animated Gamer Buttons */
+        /* 3D Action Buttons */
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             font-family: 'Orbitron', sans-serif;
             font-size: 15px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
-            background: linear-gradient(135deg, #00f0ff 0%, #7000ff 100%);
-            color: #fff;
-            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.3);
+            background: linear-gradient(135deg, var(--neon-amber) 0%, #d97706 100%);
+            color: #000;
+            box-shadow: 0 8px 25px rgba(255, 170, 0, 0.4);
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn:hover {
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.5);
-            background: linear-gradient(135deg, #7000ff 0%, #00f0ff 100%);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.6);
+            background: linear-gradient(135deg, #f59e0b 0%, var(--neon-amber) 100%);
         }
 
         .btn:active {
             transform: translateY(1px);
         }
 
-        /* Table & Action Buttons */
+        /* Table & Action Badges */
         .table-responsive {
             overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 170, 0, 0.25);
+            background: rgba(3, 5, 12, 0.7);
         }
 
         table {
@@ -260,15 +284,15 @@
         }
 
         th, td {
-            padding: 14px 16px;
+            padding: 16px 18px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         th {
             background: rgba(5, 8, 17, 0.95);
             font-family: 'Orbitron', sans-serif;
-            color: var(--neon-cyan);
+            color: var(--neon-amber);
             font-weight: 700;
             font-size: 12px;
             letter-spacing: 1px;
@@ -276,21 +300,21 @@
         }
 
         tr:hover {
-            background: rgba(0, 240, 255, 0.03);
+            background: rgba(255, 170, 0, 0.05);
         }
 
         code {
             font-family: 'JetBrains Mono', monospace;
-            color: var(--neon-gold);
-            background: rgba(255, 170, 0, 0.12);
-            padding: 4px 8px;
+            color: var(--neon-amber);
+            background: rgba(255, 215, 0, 0.12);
+            padding: 4px 10px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 170, 0, 0.25);
+            border: 1px solid rgba(255, 215, 0, 0.35);
             font-weight: 700;
         }
 
         .badge {
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-family: 'Orbitron', sans-serif;
             font-size: 11px;
@@ -301,61 +325,62 @@
         .badge-active { 
             background: rgba(0, 255, 102, 0.15); 
             color: var(--neon-green); 
-            border: 1px solid rgba(0, 255, 102, 0.3);
+            border: 1px solid rgba(0, 255, 102, 0.4);
         }
 
         .badge-inactive { 
             background: rgba(255, 42, 95, 0.15); 
             color: var(--neon-red); 
-            border: 1px solid rgba(255, 42, 95, 0.3);
+            border: 1px solid rgba(255, 42, 95, 0.4);
         }
 
         .btn-action {
-            padding: 6px 12px;
+            padding: 7px 14px;
             font-size: 12px;
             font-weight: 700;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             border: none;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .btn-copy {
-            background: rgba(0, 240, 255, 0.15);
-            color: var(--neon-cyan);
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: rgba(255, 170, 0, 0.15);
+            color: var(--neon-amber);
+            border: 1px solid rgba(255, 170, 0, 0.35);
         }
 
         .btn-copy:hover {
-            background: var(--neon-cyan);
+            background: var(--neon-amber);
             color: #000;
-            box-shadow: 0 0 12px var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-amber);
         }
 
         .btn-revoke {
             background: rgba(255, 42, 95, 0.15);
             color: var(--neon-red);
             border: 1px solid rgba(255, 42, 95, 0.3);
-            margin-left: 5px;
+            margin-left: 6px;
         }
 
         .btn-revoke:hover {
             background: var(--neon-red);
             color: #fff;
-            box-shadow: 0 0 12px var(--neon-red);
+            box-shadow: 0 0 15px var(--neon-red);
         }
 
-        @media (max-width: 650px) {
+        @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
-            .header h1 { font-size: 1.8rem; }
+            .header h1 { font-size: 2rem; }
+            .card { padding: 20px; }
         }
     </style>
 </head>
 <body>
-    <!-- Animated Particle Canvas Background -->
-    <canvas id="bgCanvas"></canvas>
+    <!-- Real 3D Ambient Background Canvas (Three.js) -->
+    <div id="threeCanvas"></div>
 
     <div class="container">
         <div class="header">
@@ -364,21 +389,21 @@
         </div>
         
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card tilt-card">
                 <h3>📦 Loaded Scripts</h3>
                 <p id="totalScripts">0</p>
             </div>
-            <div class="stat-card">
+            <div class="stat-card tilt-card">
                 <h3>🔑 Total Generated Keys</h3>
                 <p id="totalKeys">0</p>
             </div>
-            <div class="stat-card">
+            <div class="stat-card tilt-card">
                 <h3>🟢 Active Licenses</h3>
                 <p id="activeKeys">0</p>
             </div>
         </div>
 
-        <div class="card">
+        <div class="card tilt-card">
             <h2>🚀 Deploy Script Payload</h2>
             <input type="text" id="scriptTitle" placeholder="Script Title (e.g., Township Elite v4)">
             <input type="text" id="scriptCategory" placeholder="Category" value="Township">
@@ -387,7 +412,7 @@
             <button class="btn" onclick="uploadScript()">📤 Deploy Script Payload</button>
         </div>
 
-        <div class="card">
+        <div class="card tilt-card">
             <h2>🔑 VIP Access Key Generator</h2>
             <label>Select Target Script Payload:</label>
             <select id="scriptSelect"></select>
@@ -409,7 +434,7 @@
             <button class="btn" onclick="generateKey()">✨ Generate VIP Key</button>
         </div>
 
-        <div class="card">
+        <div class="card tilt-card">
             <h2>📊 Active Licenses & Managed Keys</h2>
             <div class="table-responsive">
                 <table>
@@ -430,68 +455,83 @@
     </div>
 
     <script>
-        // --- 1. Interactive Animated Particle Canvas Background ---
-        const canvas = document.getElementById('bgCanvas');
-        const ctx = canvas.getContext('2d');
+        // --- 1. True 3D Floating Geometry Background (Three.js) ---
+        const container = document.getElementById('threeCanvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        const geometries = [
+            new THREE.IcosahedronGeometry(1.2, 0),
+            new THREE.TorusGeometry(1, 0.3, 16, 100),
+            new THREE.OctahedronGeometry(1)
+        ];
 
-        const particles = [];
-        const particleCount = 45;
-
-        for (let i = 0; i < particleCount; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 2 + 1,
-                dx: (Math.random() - 0.5) * 0.6,
-                dy: (Math.random() - 0.5) * 0.6,
-                color: Math.random() > 0.5 ? '#00f0ff' : '#7000ff'
+        const shapes = [];
+        for (let i = 0; i < 16; i++) {
+            const geom = geometries[Math.floor(Math.random() * geometries.length)];
+            const material = new THREE.MeshBasicMaterial({
+                color: i % 2 === 0 ? 0xffaa00 : 0xffd700,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.25
             });
+            const mesh = new THREE.Mesh(geom, material);
+            mesh.position.set(
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 15
+            );
+            mesh.rotSpeedX = (Math.random() - 0.5) * 0.012;
+            mesh.rotSpeedY = (Math.random() - 0.5) * 0.012;
+            scene.add(mesh);
+            shapes.push(mesh);
         }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        camera.position.z = 8;
 
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.x += p.dx;
-                p.y += p.dy;
-
-                if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-                if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = p.color;
-                ctx.fill();
-
-                // Draw connecting glow lines
-                for (let j = i + 1; j < particles.length; j++) {
-                    let p2 = particles[j];
-                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                    if (dist < 130) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(0, 240, 255, ${1 - dist / 130})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animateParticles);
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            shapes.forEach(shape => {
+                shape.rotation.x += shape.rotSpeedX;
+                shape.rotation.y += shape.rotSpeedY;
+            });
+            renderer.render(scene, camera);
         }
-        animateParticles();
+        animate3D();
 
-        // --- 2. Live System Clock ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- 2. Interactive 3D Card Tilt Effect ---
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -7;
+                const rotateY = ((x - centerX) / centerX) * 7;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(8px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+            });
+        });
+
+        // --- 3. Live System Clock ---
         function updateClock() {
             const now = new Date();
             const options = { 
@@ -509,7 +549,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- 3. Dashboard API Fetching & Management ---
+        // --- 4. Dashboard API Fetching & Management ---
         async function fetchDashboard() {
             try {
                 const res = await fetch('/api/admin/dashboard');
