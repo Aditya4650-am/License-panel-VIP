@@ -1,103 +1,105 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VinzzPanel Professional Admin</title>
+    <title>Zenitsu & Evil VIP Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-[#0b0f19] text-slate-100 min-h-screen p-4 font-sans">
-    <div class="max-w-5xl mx-auto space-y-6">
+<body class="bg-[#07090e] text-slate-100 min-h-screen p-4 font-sans">
+    <div class="max-w-4xl mx-auto space-y-6">
         
         <!-- Header Banner -->
-        <header class="bg-[#131b2e] p-5 rounded-2xl border border-indigo-500/20 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
+        <header class="bg-gradient-to-r from-amber-950/40 via-[#111827] to-purple-950/40 p-5 rounded-2xl border border-amber-500/30 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg shadow-indigo-500/30">
-                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                <div class="bg-amber-500 p-3 rounded-xl text-slate-950 shadow-lg shadow-amber-500/20 font-bold text-xl">
+                    <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide text-white">Zenitsu Panel <span class="text-indigo-400 font-light">Professional</span></h1>
-                    <p class="text-xs text-slate-400">GameGuardian Key & Script Management Suite</p>
+                    <h1 class="text-xl font-extrabold tracking-wide text-white">Zenitsu <span class="text-amber-400">&</span> Evil VIP</h1>
+                    <p class="text-xs text-slate-400">Professional Script & Key Licensing Panel</p>
                 </div>
             </div>
-            <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold">
-                <i class="fa-solid fa-circle text-[8px] text-emerald-400 animate-pulse mr-1"></i> System Online
+            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold">
+                <i class="fa-solid fa-circle text-[8px] text-emerald-400 animate-pulse mr-1"></i> System Active
             </span>
         </header>
 
-        <!-- Stats Counters Grid -->
+        <!-- Stats Counters -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-[#131b2e] p-4 rounded-xl border border-slate-800">
+            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
                 <p class="text-xs text-slate-400">Total Scripts</p>
-                <h3 id="statScripts" class="text-2xl font-bold text-indigo-400 mt-1">0</h3>
+                <h3 id="statScripts" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
             </div>
-            <div class="bg-[#131b2e] p-4 rounded-xl border border-slate-800">
+            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
                 <p class="text-xs text-slate-400">Total Keys</p>
                 <h3 id="statKeys" class="text-2xl font-bold text-purple-400 mt-1">0</h3>
             </div>
-            <div class="bg-[#131b2e] p-4 rounded-xl border border-slate-800">
+            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
                 <p class="text-xs text-slate-400">Active Keys</p>
                 <h3 id="statActive" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
             </div>
-            <div class="bg-[#131b2e] p-4 rounded-xl border border-slate-800">
+            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
                 <p class="text-xs text-slate-400">Bound Devices</p>
                 <h3 id="statDevices" class="text-2xl font-bold text-sky-400 mt-1">0</h3>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 1. Script Uploader Section -->
-            <section class="bg-[#131b2e] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-lg">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+            <!-- 1. Script Uploader -->
+            <section class="bg-[#111827] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
                     <i class="fa-solid fa-code"></i> 1. Upload Game Script
                 </h2>
-                <input id="scriptTitle" type="text" placeholder="Script Name (e.g. Township VIP v4)" class="w-full bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-sm focus:border-indigo-500 outline-none">
+                <input id="scriptTitle" type="text" placeholder="Script Name (e.g. Township VIP v4)" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm focus:border-amber-500 outline-none">
                 <div class="grid grid-cols-2 gap-2">
-                    <input id="scriptCategory" type="text" placeholder="Category (e.g. Mod Menu)" class="bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-sm outline-none">
-                    <input id="scriptVersion" type="text" placeholder="Version (e.g. 4.0)" class="bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-sm outline-none">
+                    <input id="scriptCategory" type="text" placeholder="Category" class="bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none">
+                    <input id="scriptVersion" type="text" placeholder="Version (e.g. 1.0)" class="bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none">
                 </div>
-                <textarea id="scriptContent" placeholder="Paste full Lua script code here..." class="w-full bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-xs h-32 font-mono outline-none"></textarea>
-                <button onclick="uploadScript()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/20">
+                <textarea id="scriptContent" placeholder="Paste full Lua script code here..." class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-xs h-36 font-mono outline-none"></textarea>
+                <button onclick="uploadScript()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-amber-500/20">
                     <i class="fa-solid fa-upload mr-2"></i> Save & Register Script
                 </button>
             </section>
 
-            <!-- 2. Key Generator Section -->
-            <section class="bg-[#131b2e] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-lg">
+            <!-- 2. Key Generator -->
+            <section class="bg-[#111827] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
                 <h2 class="text-sm font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2">
                     <i class="fa-solid fa-key"></i> 2. Generate License Key
                 </h2>
-                <div class="space-y-3">
+                <div class="space-y-1">
                     <label class="text-xs text-slate-400">Target Script</label>
-                    <select id="scriptSelect" class="w-full bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-sm outline-none text-slate-200"></select>
+                    <select id="scriptSelect" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none text-slate-200"></select>
                 </div>
-                <input id="customKey" type="text" placeholder="Custom Key (Leave blank for random 6-digit)" class="w-full bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-sm outline-none">
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400">Custom Key (Optional)</label>
+                    <input id="customKey" type="text" placeholder="Leave blank for random 6-digit" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none">
+                </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-xs text-slate-400">Duration (Days)</label>
-                        <input id="durationDays" type="number" value="30" class="w-full bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-sm outline-none mt-1">
+                        <input id="durationDays" type="number" value="30" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none mt-1">
                     </div>
                     <div>
                         <label class="text-xs text-slate-400">Device Limit</label>
-                        <input id="deviceLimit" type="number" value="1" class="w-full bg-[#0b0f19] p-3 rounded-xl border border-slate-800 text-sm outline-none mt-1">
+                        <input id="deviceLimit" type="number" value="1" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none mt-1">
                     </div>
                 </div>
-                <button onclick="generateKey()" class="w-full bg-purple-600 hover:bg-purple-500 py-3 rounded-xl text-sm font-semibold transition shadow-lg shadow-purple-600/20">
+                <button onclick="generateKey()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/20">
                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Generate Key
                 </button>
             </section>
         </div>
 
-        <!-- 3. Key Manager Table -->
-        <section class="bg-[#131b2e] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-lg">
+        <!-- 3. Key Table Database -->
+        <section class="bg-[#111827] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
             <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
                 <i class="fa-solid fa-database"></i> Active License Database
             </h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-[#0b0f19] text-slate-400 uppercase tracking-wider">
+                    <thead class="bg-[#07090e] text-slate-400 uppercase tracking-wider">
                         <tr>
                             <th class="p-3">Key Code</th>
                             <th class="p-3">Assigned Script</th>
@@ -114,72 +116,100 @@
 
     <script>
         async function fetchDashboard() {
-            const res = await fetch('/api/admin/dashboard');
-            const data = await res.json();
-            
-            document.getElementById('statScripts').innerText = data.totalScripts;
-            document.getElementById('statKeys').innerText = data.totalKeys;
-            document.getElementById('statActive').innerText = data.activeKeys;
-            document.getElementById('statDevices').innerText = data.totalDevices;
+            try {
+                const res = await fetch('/api/admin/dashboard');
+                const data = await res.json();
+                
+                document.getElementById('statScripts').innerText = data.totalScripts;
+                document.getElementById('statKeys').innerText = data.totalKeys;
+                document.getElementById('statActive').innerText = data.activeKeys;
+                document.getElementById('statDevices').innerText = data.totalDevices;
 
-            // Populate script dropdown
-            const select = document.getElementById('scriptSelect');
-            select.innerHTML = data.scripts.map(s => `<option value="${s.id}">${s.title} (v${s.version})</option>`).join('');
+                const select = document.getElementById('scriptSelect');
+                if(data.scripts.length > 0) {
+                    select.innerHTML = data.scripts.map(s => `<option value="${s.id}">${s.title} (v${s.version})</option>`).join('');
+                } else {
+                    select.innerHTML = `<option value="">-- No Scripts Uploaded Yet --</option>`;
+                }
 
-            // Populate keys table
-            const tbody = document.getElementById('keysTable');
-            tbody.innerHTML = data.keys.map(k => `
-                <tr class="hover:bg-slate-800/30 transition">
-                    <td class="p-3 font-mono text-indigo-400 font-bold">${k.key_code}</td>
-                    <td class="p-3">${k.script_name || 'Unassigned'}</td>
-                    <td class="p-3">${k.device_limit} Device(s) | ${k.duration_days} Days</td>
-                    <td class="p-3"><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">Active</span></td>
-                </tr>
-            `).join('');
+                const tbody = document.getElementById('keysTable');
+                if(data.keys.length > 0) {
+                    tbody.innerHTML = data.keys.map(k => `
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="p-3 font-mono text-amber-400 font-bold">${k.key_code}</td>
+                            <td class="p-3">${k.script_name || 'Unassigned'}</td>
+                            <td class="p-3">${k.device_limit} Device(s) | ${k.duration_days} Days</td>
+                            <td class="p-3"><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">Active</span></td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No active keys generated yet.</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Error loading dashboard data:', err);
+            }
         }
 
         async function uploadScript() {
-            const title = document.getElementById('scriptTitle').value;
-            const category = document.getElementById('scriptCategory').value;
-            const version = document.getElementById('scriptVersion').value;
-            const content = document.getElementById('scriptContent').value;
+            const title = document.getElementById('scriptTitle').value.trim();
+            const category = document.getElementById('scriptCategory').value.trim();
+            const version = document.getElementById('scriptVersion').value.trim();
+            const content = document.getElementById('scriptContent').value.trim();
 
-            if(!title || !content) return alert('Please enter script name and content code!');
+            if(!title || !content) {
+                alert('Please provide both a Script Name and Script Code contents!');
+                return;
+            }
 
-            const res = await fetch('/api/admin/scripts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, category, version, content })
-            });
-            const data = await res.json();
-            if(data.success) {
-                alert('Script uploaded successfully!');
-                document.getElementById('scriptTitle').value = '';
-                document.getElementById('scriptContent').value = '';
-                fetchDashboard();
-            } else {
-                alert(data.error);
+            try {
+                const res = await fetch('/api/admin/scripts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, category, version, content })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert('Script Uploaded & Registered Successfully!');
+                    document.getElementById('scriptTitle').value = '';
+                    document.getElementById('scriptCategory').value = '';
+                    document.getElementById('scriptVersion').value = '';
+                    document.getElementById('scriptContent').value = '';
+                    fetchDashboard();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Failed to upload script. Check network or file size.');
             }
         }
 
         async function generateKey() {
             const scriptId = document.getElementById('scriptSelect').value;
-            const customKey = document.getElementById('customKey').value;
-            const durationDays = parseInt(document.getElementById('durationDays').value);
-            const deviceLimit = parseInt(document.getElementById('deviceLimit').value);
+            const customKey = document.getElementById('customKey').value.trim();
+            const durationDays = parseInt(document.getElementById('durationDays').value) || 30;
+            const deviceLimit = parseInt(document.getElementById('deviceLimit').value) || 1;
 
-            const res = await fetch('/api/admin/keys', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ scriptId, customKey, durationDays, deviceLimit })
-            });
-            const data = await res.json();
-            if(data.success) {
-                alert('Key Generated Successfully: ' + data.keyCode);
-                document.getElementById('customKey').value = '';
-                fetchDashboard();
-            } else {
-                alert(data.error);
+            if(!scriptId) {
+                alert('Please select or upload a script first before generating a key!');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scriptId, customKey, durationDays, deviceLimit })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert('License Key Generated Successfully: ' + data.keyCode);
+                    document.getElementById('customKey').value = '';
+                    fetchDashboard();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Failed to generate key.');
             }
         }
 
@@ -187,3 +217,4 @@
     </script>
 </body>
 </html>
+
