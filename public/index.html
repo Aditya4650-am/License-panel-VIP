@@ -1,268 +1,174 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenitsu & Evil VIP Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ZENITSU VIP - Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: #1e293b; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1, h2 { color: #38bdf8; text-align: center; margin-bottom: 5px; }
+        .live-clock { text-align: center; color: #34d399; font-size: 15px; font-weight: bold; margin-bottom: 20px; background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid #334155; }
+        .card { background: #334155; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        input, select, textarea, button { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 15px; background: #0f172a; border: 1px solid #475569; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        textarea { height: 120px; font-family: monospace; }
+        button { background: #0284c7; font-weight: bold; cursor: pointer; border: none; }
+        button:hover { background: #0369a1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #475569; padding: 8px; text-align: left; }
+        th { background: #0f172a; color: #38bdf8; }
+        .stats { display: flex; justify-content: space-around; text-align: center; }
+        .stat-box { background: #0f172a; padding: 10px; border-radius: 5px; width: 30%; border: 1px solid #38bdf8; }
+    </style>
 </head>
-<body class="bg-[#07090e] text-slate-100 min-h-screen p-4 font-sans">
-    <div class="max-w-5xl mx-auto space-y-6">
+<body>
+    <div class="container">
+        <h1>⚡ ZENITSU VIP Control Panel ⚡</h1>
+        <div id="liveClock" class="live-clock">🕒 Loading precise time...</div>
         
-        <!-- Header Banner & Live Clock -->
-        <header class="bg-gradient-to-r from-amber-950/40 via-[#111827] to-purple-950/40 p-5 rounded-2xl border border-amber-500/30 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
-            <div class="flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
-                <div class="bg-amber-500 p-3 rounded-xl text-slate-950 shadow-lg shadow-amber-500/20 font-bold text-xl">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-extrabold tracking-wide text-white">Zenitsu <span class="text-amber-400">&</span> Evil VIP</h1>
-                    <p class="text-xs text-slate-400">Professional Script & Key Licensing Panel</p>
-                </div>
-            </div>
-            <div class="flex flex-col items-center md:items-end gap-2 w-full md:w-auto">
-                <!-- Live Clock Display -->
-                <div class="text-xs font-mono text-slate-300 bg-[#07090e] px-3 py-1.5 rounded-lg border border-slate-700/50 shadow-inner flex items-center gap-2">
-                    <i class="fa-regular fa-clock text-amber-500"></i>
-                    <span id="liveClock">Loading time...</span>
-                </div>
-                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-xl text-xs font-semibold w-full md:w-auto text-center">
-                    <i class="fa-solid fa-circle text-[8px] text-emerald-400 animate-pulse mr-1"></i> System Active
-                </span>
-            </div>
-        </header>
-
-        <!-- Stats Counters -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
-                <p class="text-xs text-slate-400">Total Scripts</p>
-                <h3 id="statScripts" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
-            </div>
-            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
-                <p class="text-xs text-slate-400">Total Keys</p>
-                <h3 id="statKeys" class="text-2xl font-bold text-purple-400 mt-1">0</h3>
-            </div>
-            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
-                <p class="text-xs text-slate-400">Active Keys</p>
-                <h3 id="statActive" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
-            </div>
-            <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
-                <p class="text-xs text-slate-400">Bound Devices</p>
-                <h3 id="statDevices" class="text-2xl font-bold text-sky-400 mt-1">0</h3>
-            </div>
+        <div class="card stats">
+            <div class="stat-box"><h3>📦 Scripts</h3><p id="totalScripts">0</p></div>
+            <div class="stat-box"><h3>🔑 Total Keys</h3><p id="totalKeys">0</p></div>
+            <div class="stat-box"><h3>🟢 Active Keys</h3><p id="activeKeys">0</p></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 1. Script Uploader (WITH FILE MANAGER) -->
-            <section class="bg-[#111827] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
-                        <i class="fa-solid fa-code"></i> 1. Upload Game Script
-                    </h2>
-                    
-                    <!-- Hiding default file input, creating a custom button -->
-                    <input type="file" id="fileUploader" accept=".lua,.txt" class="hidden" onchange="handleFileUpload(event)">
-                    <button onclick="document.getElementById('fileUploader').click()" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 px-3 py-1.5 rounded-lg border border-slate-600 transition flex items-center gap-2">
-                        <i class="fa-solid fa-folder-open"></i> Browse File
-                    </button>
-                </div>
-                
-                <input id="scriptTitle" type="text" placeholder="Script Name (e.g. Township VIP v4)" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm focus:border-amber-500 outline-none">
-                
-                <div class="grid grid-cols-2 gap-2">
-                    <input id="scriptCategory" type="text" placeholder="Category" class="bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none">
-                    <input id="scriptVersion" type="text" placeholder="Version (e.g. 1.0)" class="bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none">
-                </div>
-                
-                <textarea id="scriptContent" placeholder="Select a file above or paste full Lua script code here..." class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-xs h-36 font-mono outline-none"></textarea>
-                
-                <button onclick="uploadScript()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-amber-500/20">
-                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Save to Database
-                </button>
-            </section>
-
-            <!-- 2. Key Generator -->
-            <section class="bg-[#111827] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2">
-                    <i class="fa-solid fa-key"></i> 2. Generate License Key
-                </h2>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-400">Target Script</label>
-                    <select id="scriptSelect" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none text-slate-200"></select>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-400">Custom Key (Optional)</label>
-                    <input id="customKey" type="text" placeholder="Leave blank for random 6-digit" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-slate-400">Duration (Days)</label>
-                        <input id="durationDays" type="number" value="30" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none mt-1">
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-400">Device Limit</label>
-                        <input id="deviceLimit" type="number" value="1" class="w-full bg-[#07090e] p-3 rounded-xl border border-slate-800 text-sm outline-none mt-1">
-                    </div>
-                </div>
-                <button onclick="generateKey()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/20">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Generate Key
-                </button>
-            </section>
+        <div class="card">
+            <h2>🚀 Upload New Script</h2>
+            <input type="text" id="scriptTitle" placeholder="Script Title (e.g., Township Elite v4)">
+            <input type="text" id="scriptCategory" placeholder="Category" value="Township">
+            <input type="text" id="scriptVersion" placeholder="Version" value="4.0">
+            <textarea id="scriptContent" placeholder="Paste your raw Lua script code here..."></textarea>
+            <button onclick="uploadScript()">📤 Upload Script Payload</button>
         </div>
 
-        <!-- 3. Key Table Database -->
-        <section class="bg-[#111827] p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <i class="fa-solid fa-database"></i> Active License Database
-            </h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-[#07090e] text-slate-400 uppercase tracking-wider">
+        <div class="card">
+            <h2>🔑 Generate License Key</h2>
+            <select id="scriptSelect"></select>
+            
+            <label>⏳ Select Duration Package:</label>
+            <select id="durationType">
+                <option value="7days">⚡ 7 Days Access</option>
+                <option value="1month" selected>🔥 1 Month (30 Days)</option>
+                <option value="1year">💎 1 Year (365 Days)</option>
+                <option value="lifetime">👑 Lifetime Access</option>
+            </select>
+
+            <input type="number" id="deviceLimit" placeholder="Device Limit" value="1">
+            <input type="text" id="customKey" placeholder="Custom Key (Optional - leave blank for auto VIP-XXXX)">
+            <button onclick="generateKey()">✨ Generate VIP Key</button>
+        </div>
+
+        <div class="card">
+            <h2>📊 Keys & Database Logs</h2>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
                         <tr>
-                            <th class="p-3">Key Code</th>
-                            <th class="p-3">Assigned Script</th>
-                            <th class="p-3">Limits</th>
-                            <th class="p-3">Status</th>
+                            <th>🔑 Key Code</th>
+                            <th>📜 Script Name</th>
+                            <th>⏳ Duration</th>
+                            <th>📱 Limit</th>
+                            <th>⚡ Status</th>
                         </tr>
                     </thead>
-                    <tbody id="keysTable" class="divide-y divide-slate-800/60"></tbody>
+                    <tbody id="keysTableBody"></tbody>
                 </table>
             </div>
-        </section>
-
+        </div>
     </div>
 
     <script>
-        // --- LIVE CLOCK FUNCTION ---
+        // Professional Live Clock with Emojis
         function updateClock() {
             const now = new Date();
             const options = { 
-                weekday: 'short', year: 'numeric', month: 'short', 
-                day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
             };
-            document.getElementById('liveClock').innerText = now.toLocaleString('en-IN', options);
+            document.getElementById('liveClock').innerHTML = "🕒 System Time: " + now.toLocaleString('en-US', options);
         }
-        setInterval(updateClock, 1000); // Update every second
-        updateClock(); // Initial call
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // --- FILE MANAGER HANDLER ---
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Auto-fill the script title based on the uploaded file name
-            const fileNameClean = file.name.replace(/\.[^/.]+$/, ""); // Removes extension
-            document.getElementById('scriptTitle').value = fileNameClean;
-
-            // Read the file and paste its contents into the textarea
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('scriptContent').value = e.target.result;
-            };
-            reader.readAsText(file);
-        }
-
-        // --- DASHBOARD DATA FETCHER ---
         async function fetchDashboard() {
             try {
                 const res = await fetch('/api/admin/dashboard');
                 const data = await res.json();
                 
-                document.getElementById('statScripts').innerText = data.totalScripts;
-                document.getElementById('statKeys').innerText = data.totalKeys;
-                document.getElementById('statActive').innerText = data.activeKeys;
-                document.getElementById('statDevices').innerText = data.totalDevices;
+                document.getElementById('totalScripts').innerText = data.totalScripts;
+                document.getElementById('totalKeys').innerText = data.totalKeys;
+                document.getElementById('activeKeys').innerText = data.activeKeys;
 
                 const select = document.getElementById('scriptSelect');
-                if(data.scripts.length > 0) {
-                    select.innerHTML = data.scripts.map(s => `<option value="${s.id}">${s.title} (v${s.version})</option>`).join('');
-                } else {
-                    select.innerHTML = `<option value="">-- No Scripts Uploaded Yet --</option>`;
-                }
-
-                const tbody = document.getElementById('keysTable');
-                if(data.keys.length > 0) {
-                    tbody.innerHTML = data.keys.map(k => `
-                        <tr class="hover:bg-slate-800/30 transition">
-                            <td class="p-3 font-mono text-amber-400 font-bold">${k.key_code}</td>
-                            <td class="p-3">${k.script_name || 'Unassigned'}</td>
-                            <td class="p-3">${k.device_limit} Device(s) | ${k.duration_days} Days</td>
-                            <td class="p-3"><span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">Active</span></td>
-                        </tr>
-                    `).join('');
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No active keys generated yet.</td></tr>`;
-                }
-            } catch (err) {
-                console.error('Error loading dashboard data:', err);
-            }
-        }
-
-        // --- UPLOAD TO SERVER ---
-        async function uploadScript() {
-            const title = document.getElementById('scriptTitle').value.trim();
-            const category = document.getElementById('scriptCategory').value.trim();
-            const version = document.getElementById('scriptVersion').value.trim();
-            const content = document.getElementById('scriptContent').value.trim();
-
-            if(!title || !content) {
-                alert('Please provide a Script Name and Script Code (or browse a file).');
-                return;
-            }
-
-            try {
-                const res = await fetch('/api/admin/scripts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, category, version, content })
+                select.innerHTML = '<option value="">Select Target Script</option>';
+                data.scripts.forEach(s => {
+                    select.innerHTML += `<option value="${s.id}">${s.title} (v${s.version})</option>`;
                 });
-                const data = await res.json();
-                if(data.success) {
-                    alert('Script Uploaded & Registered Successfully!');
-                    document.getElementById('scriptTitle').value = '';
-                    document.getElementById('scriptCategory').value = '';
-                    document.getElementById('scriptVersion').value = '';
-                    document.getElementById('scriptContent').value = '';
-                    document.getElementById('fileUploader').value = ''; // Reset file input
-                    fetchDashboard();
-                } else {
-                    alert('Error: ' + data.error);
-                }
+
+                const tbody = document.getElementById('keysTableBody');
+                tbody.innerHTML = '';
+                data.keys.forEach(k => {
+                    let durationText = "⚡ " + k.duration_days + " Days";
+                    if(k.duration_days >= 30000) durationText = "👑 Lifetime";
+                    else if(k.duration_days === 365) durationText = "💎 1 Year";
+                    else if(k.duration_days === 7) durationText = "⚡ 7 Days";
+
+                    tbody.innerHTML += `<tr>
+                        <td><code>${k.key_code}</code></td>
+                        <td>${k.script_name}</td>
+                        <td>${durationText}</td>
+                        <td>${k.device_limit}</td>
+                        <td>${k.is_active ? '🟢 Active' : '🔴 Inactive'}</td>
+                    </tr>`;
+                });
             } catch (err) {
-                alert('Failed to upload script. Check network or file size.');
+                console.error("Error loading dashboard data", err);
             }
         }
 
-        // --- KEY GENERATOR ---
+        async function uploadScript() {
+            const title = document.getElementById('scriptTitle').value;
+            const category = document.getElementById('scriptCategory').value;
+            const version = document.getElementById('scriptVersion').value;
+            const content = document.getElementById('scriptContent').value;
+
+            const res = await fetch('/api/admin/scripts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, category, version, content })
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("✅ Script Uploaded Successfully!");
+                fetchDashboard();
+            } else {
+                alert("❌ Error: " + data.error);
+            }
+        }
+
         async function generateKey() {
             const scriptId = document.getElementById('scriptSelect').value;
-            const customKey = document.getElementById('customKey').value.trim();
-            const durationDays = parseInt(document.getElementById('durationDays').value) || 30;
-            const deviceLimit = parseInt(document.getElementById('deviceLimit').value) || 1;
+            const durationType = document.getElementById('durationType').value;
+            const deviceLimit = document.getElementById('deviceLimit').value;
+            const customKey = document.getElementById('customKey').value;
 
-            if(!scriptId) {
-                alert('Please select or upload a script first before generating a key!');
-                return;
-            }
-
-            try {
-                const res = await fetch('/api/admin/keys', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ scriptId, customKey, durationDays, deviceLimit })
-                });
-                const data = await res.json();
-                if(data.success) {
-                    alert('License Key Generated Successfully: ' + data.keyCode);
-                    document.getElementById('customKey').value = '';
-                    fetchDashboard();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (err) {
-                alert('Failed to generate key.');
+            const res = await fetch('/api/admin/keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scriptId, durationType, deviceLimit, customKey })
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("✨ Key Generated Successfully: " + data.keyCode);
+                fetchDashboard();
+            } else {
+                alert("❌ Error: " + data.error);
             }
         }
 
