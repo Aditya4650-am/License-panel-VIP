@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const dbFile = path.join(__dirname, 'database.sqlite');
 const db = new sqlite3.Database(dbFile, (err) => {
     if (err) {
-        console.error('Error opening database', err.message);
+        console.error('Error opening database:', err.message);
     } else {
         console.log('Connected to persistent SQLite database.');
         initTables();
@@ -49,7 +49,7 @@ function initTables() {
     )`);
 }
 
-// 1. ADMIN DASHBOARD API: Returns comprehensive statistics, active keys, and uploaded scripts details
+// 1. ADMIN DASHBOARD API: Fetch statistics, active keys, and scripts
 app.get('/api/admin/dashboard', (req, res) => {
     db.all(`SELECT * FROM scripts ORDER BY created_at DESC`, [], (err, scripts) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -78,7 +78,7 @@ app.get('/api/admin/dashboard', (req, res) => {
     });
 });
 
-// 2. ADMIN SCRIPT UPLOAD API: Add new scripts to the permanent database
+// 2. ADMIN SCRIPT UPLOAD API
 app.post('/api/admin/scripts', (req, res) => {
     const { title, category, version, content } = req.body;
     if (!title || !content) return res.status(400).json({ error: "Title and Content are required!" });
@@ -95,16 +95,16 @@ app.post('/api/admin/scripts', (req, res) => {
     );
 });
 
-// 3. ADMIN KEY GENERATOR API: Supports 7 Days, 1 Month, 1 Year, and Lifetime options
+// 3. ADMIN KEY GENERATOR API (7 Days, 1 Month, 1 Year, Lifetime)
 app.post('/api/admin/keys', (req, res) => {
     const { scriptId, durationType, deviceLimit = 1, customKey } = req.body;
     if (!scriptId) return res.status(400).json({ error: "Script selection is required!" });
 
-    let durationDays = 30; // default 1 month
+    let durationDays = 30;
     if (durationType === '7days') durationDays = 7;
     else if (durationType === '1month') durationDays = 30;
     else if (durationType === '1year') durationDays = 365;
-    else if (durationType === 'lifetime') durationDays = 36500; // 100 years
+    else if (durationType === 'lifetime') durationDays = 36500;
 
     const randomHex = () => crypto.randomBytes(2).toString('hex').toUpperCase();
     const keyCode = customKey && customKey.trim() !== "" 
@@ -125,13 +125,24 @@ app.post('/api/admin/keys', (req, res) => {
     });
 });
 
-// 4. CLIENT VERIFICATION API: Validates keys, HWID limits, expiration, and delivers raw script code securely
+// 4. ADMIN REVOKE KEY API
+app.post('/api/admin/keys/revoke', (req, res) => {
+    const { keyCode } = req.body;
+    if (!keyCode) return res.status(400).json({ error: "Key code is required!" });
+
+    db.run(`UPDATE keys SET is_active = 0 WHERE key_code = ?`, [keyCode], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: "Key has been revoked successfully!" });
+    });
+});
+
+// 5. CLIENT VERIFICATION API
 app.post('/api/verify', (req, res) => {
     const { key, hwid, scriptId } = req.body;
     if (!key || !hwid) return res.status(400).send("Key and HWID are required");
 
     db.get(`SELECT * FROM keys WHERE key_code = ? AND is_active = 1`, [key], (err, keyRecord) => {
-        if (err || !keyRecord) return res.status(401).send("Invalid license key!");
+        if (err || !keyRecord) return res.status(401).send("Invalid or revoked license key!");
 
         if (scriptId && keyRecord.script_id !== scriptId) {
             return res.status(403).send("Key belongs to a different script!");
