@@ -12,20 +12,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const DB_FILE = path.join(__dirname, 'database.json');
 
-// Initialize database file if it doesn't exist
 if (!fs.existsSync(DB_FILE)) {
-    const initialData = {
-        scripts: [],
-        keys: [],
-        devices: []
-    };
-    fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
+    fs.writeFileSync(DB_FILE, JSON.stringify({ scripts: [], keys: [], devices: [] }, null, 2));
 }
 
 function readDB() {
     try {
-        const data = fs.readFileSync(DB_FILE, 'utf8');
-        return JSON.parse(data);
+        return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     } catch (err) {
         return { scripts: [], keys: [], devices: [] };
     }
@@ -35,17 +28,12 @@ function writeDB(data) {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
 }
 
-// Admin: Get Dashboard Stats & Lists
 app.get('/api/admin/dashboard', (req, res) => {
     const db = readDB();
     const scripts = db.scripts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    
     const keys = db.keys.map(k => {
         const script = db.scripts.find(s => s.id === k.script_id);
-        return {
-            ...k,
-            script_name: script ? script.title : 'Unassigned'
-        };
+        return { ...k, script_name: script ? script.title : 'Unassigned' };
     }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     res.json({
@@ -53,74 +41,46 @@ app.get('/api/admin/dashboard', (req, res) => {
         totalKeys: keys.length,
         activeKeys: keys.filter(k => k.is_active).length,
         totalDevices: db.devices.length,
-        scripts: scripts,
-        keys: keys
+        scripts,
+        keys
     });
 });
 
-// Admin: Upload Script
 app.post('/api/admin/scripts', (req, res) => {
     const { title, category, version, content } = req.body;
-    if (!title || !content) {
-        return res.status(400).json({ error: "Script Title and Content are required!" });
-    }
+    if (!title || !content) return res.status(400).json({ error: "Title and Content required!" });
 
     const db = readDB();
     const scriptId = crypto.randomUUID();
-    const newScript = {
-        id: scriptId,
-        title,
-        category: category || 'General',
-        version: version || '1.0.0',
-        content,
-        created_at: new Date().toISOString()
-    };
-
-    db.scripts.unshift(newScript);
+    db.scripts.unshift({ id: scriptId, title, category: category || 'General', version: version || '1.0.0', content, created_at: new Date().toISOString() });
     writeDB(db);
     res.json({ success: true, id: scriptId });
 });
 
-// Admin: Generate Key
 app.post('/api/admin/keys', (req, res) => {
     const { scriptId, durationDays = 30, deviceLimit = 1, customKey } = req.body;
-    if (!scriptId) return res.status(400).json({ error: "Please select a target script!" });
+    if (!scriptId) return res.status(400).json({ error: "Select a script!" });
 
     const db = readDB();
-    const keyCode = customKey && customKey.trim() !== "" 
-        ? customKey.trim() 
-        : Math.floor(100000 + Math.random() * 900000).toString();
+    const keyCode = customKey && customKey.trim() !== "" ? customKey.trim() : Math.floor(100000 + Math.random() * 900000).toString();
+    if (db.keys.some(k => k.key_code === keyCode)) return res.status(400).json({ error: "Key already exists!" });
 
-    if (db.keys.some(k => k.key_code === keyCode)) {
-        return res.status(400).json({ error: "Key code already exists!" });
-    }
-
-    const newKey = {
-        key_code: keyCode,
-        script_id: scriptId,
-        duration_days: parseInt(durationDays),
-        device_limit: parseInt(deviceLimit),
-        created_at: new Date().toISOString(),
-        expires_at: null,
-        is_active: 1
-    };
-
-    db.keys.unshift(newKey);
+    db.keys.unshift({ key_code: keyCode, script_id: scriptId, duration_days: parseInt(durationDays), device_limit: parseInt(deviceLimit), created_at: new Date().toISOString(), expires_at: null, is_active: 1 });
     writeDB(db);
     res.json({ success: true, keyCode });
 });
 
-// Client Endpoint: Script & Key Verification
+// CLIENT VERIFICATION: Returns RAW SCRIPT CONTENT directly on success
 app.post('/api/verify', (req, res) => {
     const { key, hwid, scriptId } = req.body;
-    if (!key || !hwid) return res.status(400).json({ status: "error", message: "Key and HWID required" });
+    if (!key || !hwid) return res.status(400).send("ERROR: Key and HWID required");
 
     const db = readDB();
     const keyRecord = db.keys.find(k => k.key_code === key && k.is_active === 1);
-    if (!keyRecord) return res.status(401).json({ status: "error", message: "Invalid license key!" });
+    if (!keyRecord) return res.status(401).send("ERROR: Invalid license key!");
 
     if (scriptId && keyRecord.script_id !== scriptId) {
-        return res.status(403).json({ status: "error", message: "This key belongs to a different script!" });
+        return res.status(403).send("ERROR: Key belongs to a different script!");
     }
 
     const now = new Date();
@@ -129,7 +89,7 @@ app.post('/api/verify', (req, res) => {
         expireDate.setDate(expireDate.getDate() + keyRecord.duration_days);
         keyRecord.expires_at = expireDate.toISOString();
     } else if (new Date(keyRecord.expires_at) < now) {
-        return res.status(403).json({ status: "error", message: "License key has expired!" });
+        return res.status(403).send("ERROR: License key has expired!");
     }
 
     const deviceRecords = db.devices.filter(d => d.key_code === key);
@@ -137,7 +97,7 @@ app.post('/api/verify', (req, res) => {
 
     if (!registeredHwids.includes(hwid)) {
         if (registeredHwids.length >= keyRecord.device_limit) {
-            return res.status(403).json({ status: "error", message: "Device limit reached for this key!" });
+            return res.status(403).send("ERROR: Device limit reached for this key!");
         }
         db.devices.push({ key_code: key, hwid });
     }
@@ -145,16 +105,16 @@ app.post('/api/verify', (req, res) => {
     writeDB(db);
 
     const script = db.scripts.find(s => s.id === keyRecord.script_id);
-    if (!script) return res.status(404).json({ status: "error", message: "Linked script payload not found!" });
+    if (!script) return res.status(404).send("ERROR: Linked script payload not found!");
 
-    res.json({ status: "success", content: script.content });
+    // Send the raw Lua script code directly with text/plain
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(script.content);
 });
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// PORT is declared ONLY ONCE here
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Zenitsu & Evil VIP Server running on port ${PORT}`));
-                     
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
