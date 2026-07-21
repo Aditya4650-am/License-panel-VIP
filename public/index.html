@@ -3,29 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ ZENITSU VIP - Gamer Edition ⚡</title>
+    <title>⚡ ZENITSU VIP - Pro Dark Cyber Edition ⚡</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <!-- Three.js for true 3D Canvas Background -->
+    <!-- Three.js for 3D Ambient Background -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #03050c;
-            --neon-gold: #ffaa00;
-            --neon-amber: #ffd700;
+            --bg-ultra-dark: #02060e;
+            --panel-dark: rgba(6, 12, 24, 0.88);
+            --panel-depth: #040814;
+            
+            /* Professional Blue & Green Dark Cyber Palette */
+            --neon-blue: #0066ff;
             --neon-cyan: #00f0ff;
-            --neon-purple: #8000ff;
             --neon-green: #00ff66;
+            --neon-dark-green: #00b348;
             --neon-red: #ff2a5f;
             
-            /* Custom Zenitsu Background Image - Ensure 6117533.jpg is in the same directory */
-            --bg-image-url: url('6117533.jpg');
+            /* High Contrast Dark/Bright Text Colors */
+            --text-heading: #e6f7ff;
+            --text-body: #a3c2e0;
+            --text-muted: #5c7f9e;
+            --text-dark-label: #00f0ff;
             
-            --glass-bg: rgba(8, 10, 20, 0.72);
-            --glass-border: rgba(255, 170, 0, 0.35);
-            --text-main: #f0f6fc;
-            --text-muted: #a3b3c2;
+            --glass-border: rgba(0, 240, 255, 0.25);
+            --glass-border-green: rgba(0, 255, 102, 0.25);
+            
+            /* Custom Zenitsu Background Image */
+            --bg-image-url: url('6117533.jpg');
         }
 
         * {
@@ -33,19 +40,19 @@
             margin: 0;
             padding: 0;
             font-family: 'Rajdhani', sans-serif;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease-out;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-ultra-dark);
             background-image: 
-                radial-gradient(circle at center, rgba(3, 5, 12, 0.5) 0%, rgba(3, 5, 12, 0.95) 100%),
+                radial-gradient(circle at 50% 20%, rgba(0, 102, 255, 0.15) 0%, rgba(2, 6, 14, 0.98) 80%),
                 var(--bg-image-url);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: var(--text-main);
+            color: var(--text-body);
             min-height: 100vh;
             padding: 30px 15px;
             overflow-x: hidden;
@@ -68,10 +75,9 @@
             margin: 0 auto;
             position: relative;
             z-index: 1;
-            perspective: 1200px;
         }
 
-        /* Header & Title Effects */
+        /* Header & Dynamic Glowing Text */
         .header {
             text-align: center;
             margin-bottom: 35px;
@@ -83,16 +89,16 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 3px;
-            background: linear-gradient(135deg, var(--neon-amber) 0%, var(--neon-gold) 50%, #ffffff 100%);
+            background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 50%, var(--neon-green) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 35px rgba(255, 170, 0, 0.6);
-            animation: thunderPulse 2.5s infinite alternate;
+            text-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+            animation: cyberPulse 3s infinite alternate;
         }
 
-        @keyframes thunderPulse {
-            0% { filter: drop-shadow(0 0 10px rgba(255, 170, 0, 0.4)); }
-            100% { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9)); }
+        @keyframes cyberPulse {
+            0% { filter: drop-shadow(0 0 10px rgba(0, 102, 255, 0.5)); }
+            100% { filter: drop-shadow(0 0 25px rgba(0, 255, 102, 0.8)); }
         }
 
         .live-clock {
@@ -100,19 +106,19 @@
             align-items: center;
             gap: 8px;
             margin-top: 14px;
-            padding: 8px 22px;
-            background: rgba(5, 8, 17, 0.85);
-            border: 1px solid var(--neon-gold);
+            padding: 8px 24px;
+            background: rgba(3, 8, 18, 0.9);
+            border: 1px solid var(--neon-cyan);
             border-radius: 30px;
-            color: var(--neon-amber);
+            color: var(--neon-cyan);
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
             font-weight: 700;
             backdrop-filter: blur(12px);
-            box-shadow: 0 0 20px rgba(255, 170, 0, 0.25), inset 0 0 10px rgba(255, 170, 0, 0.15);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
         }
 
-        /* Stats Cards */
+        /* 3D Dark Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -121,16 +127,26 @@
         }
 
         .stat-card {
-            background: var(--glass-bg);
+            background: linear-gradient(145deg, var(--panel-dark) 0%, var(--panel-depth) 100%);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            padding: 22px;
+            padding: 24px;
             text-align: center;
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 
+                        inset 0 1px 0 rgba(0, 240, 255, 0.2),
+                        0 5px 0 0 rgba(0, 102, 255, 0.4);
+            transform: translateY(0);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.3), 
+                        inset 0 1px 0 rgba(0, 255, 102, 0.4),
+                        0 8px 0 0 var(--neon-green);
+            border-color: var(--neon-green);
         }
 
         .stat-card::before {
@@ -140,8 +156,8 @@
             left: -100%;
             width: 100%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-amber), transparent);
-            animation: borderSlide 2.5s infinite linear;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-green), transparent);
+            animation: borderSlide 3s infinite linear;
         }
 
         @keyframes borderSlide {
@@ -159,40 +175,43 @@
 
         .stat-card p {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.4rem;
+            font-size: 2.5rem;
             font-weight: 900;
-            color: #fff;
+            color: var(--text-heading);
             margin-top: 6px;
-            text-shadow: 0 0 15px var(--neon-gold);
+            text-shadow: 0 0 15px var(--neon-blue);
         }
 
-        /* Static Cards (Tilt Effect Disabled) */
+        /* Dark Modern 3D Panels */
         .card {
-            background: var(--glass-bg);
+            background: linear-gradient(160deg, var(--panel-dark) 0%, rgba(2, 6, 16, 0.95) 100%);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 30px;
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85), 
+                        inset 0 1px 1px rgba(255, 255, 255, 0.08),
+                        inset 0 -2px 10px rgba(0, 0, 0, 0.8);
+            position: relative;
         }
 
         .card:hover {
-            border-color: rgba(255, 215, 0, 0.7);
-            box-shadow: 0 25px 50px rgba(255, 170, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(0, 240, 255, 0.5);
+            box-shadow: 0 25px 50px rgba(0, 102, 255, 0.25), 
+                        inset 0 1px 2px rgba(0, 255, 102, 0.3);
         }
 
         .card h2 {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.35rem;
-            color: var(--neon-amber);
+            color: var(--neon-cyan);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
             letter-spacing: 1px;
-            text-shadow: 0 0 12px rgba(255, 170, 0, 0.4);
+            text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
         }
 
         /* Form Controls */
@@ -200,7 +219,7 @@
             display: block;
             font-size: 0.85rem;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--text-dark-label);
             margin-top: 14px;
             margin-bottom: 6px;
             text-transform: uppercase;
@@ -211,20 +230,20 @@
             width: 100%;
             padding: 14px 18px;
             margin-bottom: 16px;
-            background: rgba(5, 8, 17, 0.85);
-            border: 1px solid rgba(255, 170, 0, 0.3);
+            background: rgba(2, 6, 12, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 12px;
-            color: #fff;
+            color: #ffffff;
             font-size: 15px;
             font-weight: 600;
             outline: none;
-            backdrop-filter: blur(5px);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: var(--neon-amber);
-            box-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
-            background: rgba(10, 15, 29, 0.95);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.3), inset 0 2px 5px rgba(0, 0, 0, 0.9);
+            background: rgba(3, 10, 20, 0.95);
         }
 
         textarea {
@@ -233,7 +252,7 @@
             resize: vertical;
         }
 
-        /* 3D Action Buttons */
+        /* Professional 3D Action Buttons */
         .btn {
             width: 100%;
             padding: 16px;
@@ -245,33 +264,38 @@
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--neon-amber) 0%, #d97706 100%);
-            color: #000;
-            box-shadow: 0 8px 25px rgba(255, 170, 0, 0.4);
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-dark-green) 100%);
+            color: #ffffff;
+            box-shadow: 0 6px 0 #003380, 0 10px 25px rgba(0, 255, 102, 0.3);
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
         .btn:hover {
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.6);
-            background: linear-gradient(135deg, #f59e0b 0%, var(--neon-amber) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #003380, 0 15px 30px rgba(0, 255, 102, 0.5);
+            background: linear-gradient(135deg, #0055ee 0%, var(--neon-green) 100%);
+            color: #02060e;
+            text-shadow: none;
         }
 
         .btn:active {
-            transform: translateY(1px);
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #003380, 0 5px 10px rgba(0, 255, 102, 0.2);
         }
 
-        /* Table & Action Badges */
+        /* Dark Cyber Table & Badges */
         .table-responsive {
             overflow-x: auto;
             border-radius: 14px;
-            border: 1px solid rgba(255, 170, 0, 0.25);
-            background: rgba(3, 5, 12, 0.7);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            background: rgba(2, 5, 10, 0.85);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9);
         }
 
         table {
@@ -283,30 +307,31 @@
         th, td {
             padding: 16px 18px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.08);
         }
 
         th {
-            background: rgba(5, 8, 17, 0.95);
+            background: rgba(4, 10, 22, 0.95);
             font-family: 'Orbitron', sans-serif;
-            color: var(--neon-amber);
+            color: var(--neon-cyan);
             font-weight: 700;
             font-size: 12px;
             letter-spacing: 1px;
             text-transform: uppercase;
+            border-bottom: 2px solid rgba(0, 240, 255, 0.3);
         }
 
         tr:hover {
-            background: rgba(255, 170, 0, 0.05);
+            background: rgba(0, 240, 255, 0.04);
         }
 
         code {
             font-family: 'JetBrains Mono', monospace;
-            color: var(--neon-amber);
-            background: rgba(255, 215, 0, 0.12);
+            color: var(--neon-green);
+            background: rgba(0, 255, 102, 0.08);
             padding: 4px 10px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 215, 0, 0.35);
+            border: 1px solid rgba(0, 255, 102, 0.3);
             font-weight: 700;
         }
 
@@ -320,15 +345,17 @@
         }
 
         .badge-active { 
-            background: rgba(0, 255, 102, 0.15); 
+            background: rgba(0, 255, 102, 0.12); 
             color: var(--neon-green); 
             border: 1px solid rgba(0, 255, 102, 0.4);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
         }
 
         .badge-inactive { 
-            background: rgba(255, 42, 95, 0.15); 
+            background: rgba(255, 42, 95, 0.12); 
             color: var(--neon-red); 
             border: 1px solid rgba(255, 42, 95, 0.4);
+            box-shadow: 0 0 10px rgba(255, 42, 95, 0.2);
         }
 
         .btn-action {
@@ -344,19 +371,19 @@
         }
 
         .btn-copy {
-            background: rgba(255, 170, 0, 0.15);
-            color: var(--neon-amber);
-            border: 1px solid rgba(255, 170, 0, 0.35);
+            background: rgba(0, 240, 255, 0.12);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.35);
         }
 
         .btn-copy:hover {
-            background: var(--neon-amber);
-            color: #000;
-            box-shadow: 0 0 15px var(--neon-amber);
+            background: var(--neon-cyan);
+            color: #02060e;
+            box-shadow: 0 0 15px var(--neon-cyan);
         }
 
         .btn-revoke {
-            background: rgba(255, 42, 95, 0.15);
+            background: rgba(255, 42, 95, 0.12);
             color: var(--neon-red);
             border: 1px solid rgba(255, 42, 95, 0.3);
             margin-left: 6px;
@@ -376,7 +403,7 @@
     </style>
 </head>
 <body>
-    <!-- Real 3D Ambient Background Canvas (Three.js) -->
+    <!-- 3D Ambient Background Canvas (Three.js with Dark Blue & Green Lighting) -->
     <div id="threeCanvas"></div>
 
     <div class="container">
@@ -452,7 +479,7 @@
     </div>
 
     <script>
-        // --- 1. True 3D Floating Geometry Background (Three.js) ---
+        // --- 1. 3D Geometry Background with Dark Blue/Green Palette (Three.js) ---
         const container = document.getElementById('threeCanvas');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -468,13 +495,13 @@
         ];
 
         const shapes = [];
-        for (let i = 0; i < 16; i++) {
+        for (let i = 0; i < 18; i++) {
             const geom = geometries[Math.floor(Math.random() * geometries.length)];
             const material = new THREE.MeshBasicMaterial({
-                color: i % 2 === 0 ? 0xffaa00 : 0xffd700,
+                color: i % 2 === 0 ? 0x0066ff : 0x00ff66,
                 wireframe: true,
                 transparent: true,
-                opacity: 0.25
+                opacity: 0.2
             });
             const mesh = new THREE.Mesh(geom, material);
             mesh.position.set(
@@ -482,8 +509,8 @@
                 (Math.random() - 0.5) * 20,
                 (Math.random() - 0.5) * 15
             );
-            mesh.rotSpeedX = (Math.random() - 0.5) * 0.012;
-            mesh.rotSpeedY = (Math.random() - 0.5) * 0.012;
+            mesh.rotSpeedX = (Math.random() - 0.5) * 0.008;
+            mesh.rotSpeedY = (Math.random() - 0.5) * 0.008;
             scene.add(mesh);
             shapes.push(mesh);
         }
@@ -524,7 +551,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- 3. Dashboard API Fetching & Management ---
+        // --- 3. Dashboard API Functions ---
         async function fetchDashboard() {
             try {
                 const res = await fetch('/api/admin/dashboard');
@@ -579,7 +606,7 @@
         }
 
         async function revokeKey(keyCode) {
-            if(!confirm("Are you sure you want to revoke / cancel key:\n" + keyCode + "?")) return;
+            if(!confirm("Are you sure you want to revoke key:\n" + keyCode + "?")) return;
 
             const res = await fetch('/api/admin/keys/revoke', {
                 method: 'POST',
