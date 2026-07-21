@@ -20,31 +20,45 @@ const db = new sqlite3.Database(dbFile, (err) => {
 });
 
 function initTables() {
-    db.run(`CREATE TABLE IF NOT EXISTS scripts (
-        id TEXT PRIMARY KEY,
-        title TEXT,
-        category TEXT,
-        version TEXT,
-        content TEXT,
-        created_at TEXT
-    )`);
+    db.serialize(() => {
+        db.run(`CREATE TABLE IF NOT EXISTS scripts (
+            id TEXT PRIMARY KEY,
+            title TEXT,
+            category TEXT,
+            version TEXT,
+            content TEXT,
+            created_at TEXT
+        )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS keys (
-        key_code TEXT PRIMARY KEY,
-        script_id TEXT,
-        duration_days INTEGER,
-        device_limit INTEGER,
-        created_at TEXT,
-        expires_at TEXT,
-        is_active INTEGER
-    )`);
+        db.run(`CREATE TABLE IF NOT EXISTS keys (
+            key_code TEXT PRIMARY KEY,
+            script_id TEXT,
+            duration_days INTEGER,
+            device_limit INTEGER,
+            created_at TEXT,
+            expires_at TEXT,
+            is_active INTEGER
+        )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS devices (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        key_code TEXT,
-        hwid TEXT
-    )`);
+        db.run(`CREATE TABLE IF NOT EXISTS devices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            key_code TEXT,
+            hwid TEXT
+        )`);
+
+        // Performance Indexes for ultra-fast lookup speed
+        db.run(`CREATE INDEX IF NOT EXISTS idx_keys_code ON keys(key_code)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_devices_key ON devices(key_code)`);
+    });
 }
+
+// Global No-Cache Middleware
+app.use('/api', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+});
 
 // Admin Dashboard Stats
 app.get('/api/admin/dashboard', (req, res) => {
@@ -92,7 +106,7 @@ app.post('/api/admin/scripts', (req, res) => {
     );
 });
 
-// Delete Script Endpoint (Added with SQLite cascade cleanup)
+// Delete Script Endpoint (With Cascade Clean-up)
 app.post('/api/admin/scripts/delete', (req, res) => {
     const { scriptId } = req.body;
     if (!scriptId) return res.status(400).json({ error: "Script ID is required!" });
@@ -103,16 +117,12 @@ app.post('/api/admin/scripts/delete', (req, res) => {
             return res.status(404).json({ error: "Script not found!" });
         }
 
-        // Clean up linked keys and their registered devices
         db.all(`SELECT key_code FROM keys WHERE script_id = ?`, [scriptId], (err, keys) => {
             if (!err && keys && keys.length > 0) {
                 const keyCodes = keys.map(k => k.key_code);
                 const placeholders = keyCodes.map(() => '?').join(',');
 
-                // Delete devices attached to keys linked to deleted script
                 db.run(`DELETE FROM devices WHERE key_code IN (${placeholders})`, keyCodes);
-
-                // Delete linked keys
                 db.run(`DELETE FROM keys WHERE script_id = ?`, [scriptId]);
             }
         });
@@ -162,14 +172,16 @@ app.post('/api/admin/keys/revoke', (req, res) => {
     });
 });
 
-// Verify License Key & Deliver Payload
+// Optimized Fast Verification Endpoint
 app.post('/api/verify', (req, res) => {
     const { key, hwid } = req.body;
     if (!key || !hwid) {
         return res.status(400).send("Invalid request payload (Missing Key or HWID)");
     }
 
-    db.get(`SELECT * FROM keys WHERE key_code = ? AND is_active = 1`, [key], (err, keyRecord) => {
+    const cleanKey = key.trim();
+
+    db.get(`SELECT * FROM keys WHERE key_code = ? AND is_active = 1`, [cleanKey], (err, keyRecord) => {
         if (err || !keyRecord) {
             return res.status(401).send("Invalid or revoked license key!");
         }
@@ -181,12 +193,12 @@ app.post('/api/verify', (req, res) => {
             const expireDate = new Date();
             expireDate.setDate(expireDate.getDate() + keyRecord.duration_days);
             expiresAt = expireDate.toISOString();
-            db.run(`UPDATE keys SET expires_at = ? WHERE key_code = ?`, [expiresAt, key]);
+            db.run(`UPDATE keys SET expires_at = ? WHERE key_code = ?`, [expiresAt, cleanKey]);
         } else if (new Date(expiresAt) < now) {
             return res.status(403).send("License key has expired!");
         }
 
-        db.all(`SELECT * FROM devices WHERE key_code = ?`, [key], (err, deviceRecords) => {
+        db.all(`SELECT hwid FROM devices WHERE key_code = ?`, [cleanKey], (err, deviceRecords) => {
             if (err) return res.status(500).send("Database error");
 
             const registeredHwids = (deviceRecords || []).map(d => d.hwid);
@@ -195,7 +207,7 @@ app.post('/api/verify', (req, res) => {
                 if (registeredHwids.length >= keyRecord.device_limit) {
                     return res.status(403).send("Device limit reached for this key!");
                 }
-                db.run(`INSERT INTO devices (key_code, hwid) VALUES (?, ?)`, [key, hwid]);
+                db.run(`INSERT INTO devices (key_code, hwid) VALUES (?, ?)`, [cleanKey, hwid]);
             }
 
             db.get(`SELECT content FROM scripts WHERE id = ?`, [keyRecord.script_id], (err, script) => {
