@@ -1,8 +1,14 @@
 const express = require('express');
 const multer  = require('multer');
 const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
+
+// Enable trust proxy for Render reverse proxy (Ensures correct HTTPS protocol detection)
+app.set('trust proxy', 1);
+
 const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
 
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -17,11 +23,15 @@ app.use((req, res, next) => {
 });
 
 // ==========================================
-// SQLITE DATABASE SETUP (Persistent Storage)
+// SQLITE DATABASE SETUP (Persistent Path Support)
 // ==========================================
-const db = new sqlite3.Database('./dashboard.db', (err) => {
+// If running on Render with a mounted disk at /var/data, it uses /var/data/dashboard.db
+const dataDir = fs.existsSync('/var/data') ? '/var/data' : __dirname;
+const dbPath = path.join(dataDir, 'dashboard.db');
+
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) console.error("Database connection error:", err);
-  else console.log("Connected to SQLite Database.");
+  else console.log(`Connected to SQLite Database at: ${dbPath}`);
 });
 
 db.serialize(() => {
@@ -50,37 +60,42 @@ db.serialize(() => {
     if (row && row.count === 0) {
       db.run(
         "INSERT INTO scripts (name, content, updated_at) VALUES (?, ?, ?)",
-        ["Default Payload", 'gg.toast("⚡ VIP Script Loaded Successfully!")\ngg.alert("Welcome to Township VIP Script!")', new Date().toISOString()]
+        ["Default VIP Payload", 'gg.toast("⚡ VIP Script Loaded Successfully!")\ngg.alert("Welcome to Zenitsu VIP Panel!")', new Date().toISOString()]
       );
     }
   });
 });
 
 // ==========================================
-// 1. ADMIN DASHBOARD ROUTE (WEB PANEL UI)
+// 1. ADMIN DASHBOARD ROUTE (MODERN VIP UI)
 // ==========================================
 app.get('/', (req, res) => {
   db.all("SELECT * FROM keys ORDER BY created_at DESC", [], (err, keys) => {
     if (err) keys = [];
-    db.get("SELECT * FROM scripts ORDER BY id DESC LIMIT 1", [], (err, script) => {
-      const activeScript = script ? script.content : "";
-      const scriptName = script ? script.name : "None";
+    db.all("SELECT * FROM scripts ORDER BY id DESC", [], (err, scripts) => {
+      if (err) scripts = [];
+      
+      const activeScriptObj = scripts.length > 0 ? scripts[0] : null;
+      const activeScript = activeScriptObj ? activeScriptObj.content : "";
+      const scriptName = activeScriptObj ? activeScriptObj.name : "None";
       const currentTime = Math.floor(Date.now() / 1000);
+
+      const activeKeysCount = keys.filter(k => k.expires_at === 0 || k.expires_at > currentTime).length;
 
       let keyRows = keys.map(k => {
         const isExpired = k.expires_at !== 0 && k.expires_at < currentTime;
-        const expDate = k.expires_at === 0 ? "Lifetime" : new Date(k.expires_at * 1000).toLocaleString();
+        const expDate = k.expires_at === 0 ? "👑 Lifetime" : new Date(k.expires_at * 1000).toLocaleString();
         return `
           <tr>
-            <td style="font-family: monospace; font-weight: bold; color: #38bdf8;">${k.code}</td>
-            <td>${k.bound_device || '<span style="color: #94a3b8;">Unbound</span>'}</td>
+            <td><code style="color:#00ff88;">${k.code}</code></td>
+            <td>${k.bound_device ? `<code style="color:#00e5ff;">${k.bound_device}</code>` : '<span style="color: #64748b;">Unbound</span>'}</td>
             <td><span class="badge ${isExpired ? 'badge-red' : 'badge-green'}">${isExpired ? 'EXPIRED' : 'ACTIVE'}</span></td>
-            <td>${expDate}</td>
+            <td style="color:#e2e8f0;">${expDate}</td>
             <td style="display: flex; gap: 0.5rem; align-items: center;">
-              <button type="button" class="btn-copy" onclick="copyToClipboard('${k.code}')">Copy</button>
+              <button type="button" class="btn-action btn-copy" onclick="copyToClipboard('${k.code}')">📋 Copy</button>
               <form action="/admin/delete-key" method="POST" style="display:inline; margin:0;">
                 <input type="hidden" name="code" value="${k.code}" />
-                <button type="submit" class="btn-danger">Delete</button>
+                <button type="submit" class="btn-action btn-danger">🗑️ Delete</button>
               </form>
             </td>
           </tr>
@@ -93,101 +108,118 @@ app.get('/', (req, res) => {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>VIP Admin Panel</title>
+          <title>⚡ ZENITSU VIP CONTROL PANEL ⚡</title>
+          <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Rajdhani:wght@500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
           <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+            :root {
+              --bg-dark: #020912;
+              --card-bg: rgba(10, 25, 47, 0.85);
+              --neon-blue: #00e5ff;
+              --neon-green: #00ff88;
+              --text-dark: #0a2540;
+              --border-blue: rgba(0, 229, 255, 0.3);
+            }
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; transition: all 0.2s ease; }
+            body { background-color: var(--bg-dark); color: #e6f1ff; padding: 30px 15px; min-height: 100vh; }
             .container { max-width: 1100px; margin: 0 auto; }
-            header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
-            h1 { color: #38bdf8; font-size: 1.8rem; }
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-            .card { background: #1e293b; border: 1px solid #334155; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-            .card h2 { font-size: 1.2rem; color: #cbd5e1; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
-            form { display: flex; flex-direction: column; gap: 1rem; }
-            label { font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.2rem; display: block; }
-            input, select, textarea { width: 100%; padding: 0.75rem; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; font-size: 0.95rem; }
-            textarea { font-family: monospace; height: 140px; resize: vertical; }
-            button { background: #0284c7; color: white; border: none; padding: 0.75rem 1.25rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-            button:hover { background: #0369a1; }
-            .btn-success { background: #16a34a; }
-            .btn-success:hover { background: #15803d; }
-            .btn-danger { background: #ef4444; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
-            .btn-danger:hover { background: #dc2626; }
-            .btn-copy { background: #334155; color: #f8fafc; padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 4px; }
-            .btn-copy:hover { background: #475569; }
-            table { width: 100%; border-collapse: collapse; margin-top: 1rem; text-align: left; }
-            th, td { padding: 0.75rem; border-bottom: 1px solid #334155; font-size: 0.9rem; }
-            th { color: #94a3b8; font-weight: 600; background: #0f172a; }
-            .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-            .badge-green { background: #166534; color: #4ade80; }
-            .badge-red { background: #991b1b; color: #fca5a5; }
-            .status-dot { height: 10px; width: 10px; background-color: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; }
-            .file-upload-box { border: 2px dashed #334155; padding: 1rem; text-align: center; border-radius: 6px; background: #0f172a; cursor: pointer; }
-            .file-upload-box:hover { border-color: #0284c7; }
+            header { text-align: center; margin-bottom: 35px; }
+            h1 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, var(--neon-green), var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 25px rgba(0, 229, 255, 0.4); }
+            .status-bar { margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--neon-green); }
+            .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+            .stat-card { background: var(--card-bg); border: 1px solid var(--border-blue); padding: 20px; border-radius: 14px; text-align: center; backdrop-filter: blur(10px); }
+            .stat-card h3 { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--neon-blue); }
+            .stat-card p { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; color: var(--neon-green); margin-top: 5px; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+            .card { background: var(--card-bg); border: 1px solid var(--border-blue); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+            .card h2 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--neon-green); margin-bottom: 18px; border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+            label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--neon-blue); margin-top: 10px; margin-bottom: 5px; text-transform: uppercase; }
+            input[type="text"], select, textarea, input[type="file"] { width: 100%; padding: 12px; background: rgba(2, 9, 18, 0.9); border: 1px solid var(--border-blue); border-radius: 8px; color: #fff; font-size: 14px; outline: none; }
+            textarea { font-family: 'JetBrains Mono', monospace; height: 120px; resize: vertical; color: var(--neon-green); }
+            input:focus, select:focus, textarea:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+            .btn { width: 100%; padding: 14px; margin-top: 15px; background: linear-gradient(135deg, var(--neon-green), var(--neon-blue)); border: none; border-radius: 8px; color: var(--text-dark); font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; }
+            .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 229, 255, 0.4); }
+            .btn-action { padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; }
+            .btn-copy { background: rgba(0, 229, 255, 0.15); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+            .btn-copy:hover { background: var(--neon-blue); color: var(--text-dark); }
+            .btn-danger { background: rgba(255, 42, 95, 0.15); color: #ff2a5f; border: 1px solid #ff2a5f; }
+            .btn-danger:hover { background: #ff2a5f; color: #fff; }
+            .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-blue); }
+            table { width: 100%; border-collapse: collapse; font-size: 14px; }
+            th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid rgba(0, 229, 255, 0.1); }
+            th { background: rgba(5, 15, 30, 0.95); font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 11px; }
+            code { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+            .badge { padding: 4px 10px; border-radius: 12px; font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700; }
+            .badge-green { background: rgba(0, 255, 136, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); }
+            .badge-red { background: rgba(255, 42, 95, 0.15); color: #ff2a5f; border: 1px solid #ff2a5f; }
+            @media (max-width: 768px) { .grid, .stats-grid { grid-template-columns: 1fr; } }
           </style>
           <script>
             function copyToClipboard(text) {
-              navigator.clipboard.writeText(text).then(() => {
-                alert("Copied key: " + text);
-              });
+              navigator.clipboard.writeText(text).then(() => alert("📋 Copied VIP Key: " + text));
             }
           </script>
         </head>
         <body>
           <div class="container">
             <header>
-              <h1>⚡ VIP Script Control Panel</h1>
-              <div><span class="status-dot"></span> Server Active</div>
+              <h1>⚡ ZENITSU VIP CONTROL PANEL ⚡</h1>
+              <div class="status-bar">🟢 Server Active & Running | SQLite Engine Sync</div>
             </header>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h3>📜 Active Payload</h3>
+                <p style="font-size: 1.2rem; margin-top: 12px; word-break: break-all;">${scriptName}</p>
+              </div>
+              <div class="stat-card">
+                <h3>🔑 Total Licenses</h3>
+                <p>${keys.length}</p>
+              </div>
+              <div class="stat-card">
+                <h3>🟢 Active VIP Keys</h3>
+                <p>${activeKeysCount}</p>
+              </div>
+            </div>
 
             <div class="grid">
               <!-- Create Key Section -->
               <div class="card">
-                <h2>🔑 Generate License Key</h2>
+                <h2>🔑 Generate VIP Access Key</h2>
                 <form action="/admin/create-key" method="POST">
                   <div>
-                    <label>Custom Key Code (Optional):</label>
-                    <input type="text" name="custom_code" placeholder="Leave blank to auto-generate" />
+                    <label>Custom License Key (Optional):</label>
+                    <input type="text" name="custom_code" placeholder="Leave blank for auto-generate (ZENITSU-XXX)" />
                   </div>
                   <div>
                     <label>Key Duration:</label>
                     <select name="duration">
-                      <option value="1">1 Day</option>
-                      <option value="7">7 Days</option>
-                      <option value="30" selected>30 Days</option>
-                      <option value="365">1 Year</option>
-                      <option value="0">Lifetime</option>
+                      <option value="1">⚡ 1 Day Access</option>
+                      <option value="7">⚡ 7 Days Access</option>
+                      <option value="30" selected>🔥 30 Days (1 Month)</option>
+                      <option value="365">💎 365 Days (1 Year)</option>
+                      <option value="0">👑 Lifetime Access</option>
                     </select>
                   </div>
-                  <button type="submit">Generate VIP Key</button>
+                  <button type="submit" class="btn">✨ Generate License Key</button>
                 </form>
               </div>
 
               <!-- Script Management Section -->
               <div class="card">
-                <h2>
-                  <span>📜 Manage Remote Script</span>
-                  <span style="font-size: 0.8rem; color: #38bdf8;">Active: ${scriptName}</span>
-                </h2>
+                <h2>📜 Manage Payload Code</h2>
 
-                <!-- Direct Upload Section -->
-                <form action="/admin/upload-script-file" method="POST" enctype="multipart/form-data" style="margin-bottom: 1rem;">
-                  <label>📁 Upload New Lua File (.lua):</label>
-                  <div style="display: flex; gap: 0.5rem;">
-                    <input type="file" name="script_file" accept=".lua,.txt" required style="padding: 0.4rem;" />
-                    <button type="submit" class="btn-success" style="white-space: nowrap;">Upload Script</button>
-                  </div>
+                <form action="/admin/upload-script-file" method="POST" enctype="multipart/form-data">
+                  <label>📁 File Upload (.lua / .txt):</label>
+                  <input type="file" name="script_file" accept=".lua,.txt" required />
+                  <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--neon-blue), #0055ff); color:#fff; margin-top:8px;">📤 Upload File Payload</button>
                 </form>
 
-                <hr style="border-color: #334155; margin: 0.5rem 0 1rem 0;" />
+                <hr style="border-color: rgba(0, 229, 255, 0.2); margin: 15px 0;" />
 
-                <!-- Text Mode -->
                 <form action="/admin/update-script" method="POST">
-                  <div>
-                    <label>Or Edit Code Directly:</label>
-                    <textarea name="lua_script">${activeScript}</textarea>
-                  </div>
-                  <button type="submit">Save Editor Changes</button>
+                  <label>Or Edit Code Directly:</label>
+                  <textarea name="lua_script" placeholder="Paste Lua Script Content...">${activeScript}</textarea>
+                  <button type="submit" class="btn">💾 Save Script Payload</button>
                 </form>
               </div>
             </div>
@@ -195,25 +227,27 @@ app.get('/', (req, res) => {
             <!-- Key Management Table -->
             <div class="card">
               <h2>
-                <span>📊 Active VIP License Keys (${keys.length})</span>
-                <form action="/admin/delete-all-keys" method="POST" onsubmit="return confirm('Are you sure you want to delete ALL keys?');" style="margin:0; display:inline;">
-                  <button type="submit" class="btn-danger">Delete All Keys</button>
+                <span>📊 VIP Licenses Database</span>
+                <form action="/admin/delete-all-keys" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to delete ALL keys?');" style="margin:0; display:inline;">
+                  <button type="submit" class="btn-action btn-danger">⚠️ Delete All Keys</button>
                 </form>
               </h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>License Key</th>
-                    <th>Bound Device ID</th>
-                    <th>Status</th>
-                    <th>Expiration</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${keyRows || '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No license keys found. Generate one above!</td></tr>'}
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Key Code</th>
+                      <th>Bound Device (HWID)</th>
+                      <th>Status</th>
+                      <th>Expiration</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${keyRows || '<tr><td colspan="5" style="text-align:center; color: var(--neon-blue);">No license keys generated yet.</td></tr>'}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </body>
@@ -232,7 +266,7 @@ app.post('/admin/create-key', (req, res) => {
   const customCode = req.body.custom_code ? req.body.custom_code.trim() : "";
   const durationDays = parseInt(req.body.duration) || 30;
 
-  const code = customCode !== "" ? customCode : "VIP-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+  const code = customCode !== "" ? customCode : "ZENITSU-" + Math.random().toString(36).substring(2, 10).toUpperCase();
   const expiresAt = durationDays === 0 ? 0 : Math.floor(Date.now() / 1000) + (durationDays * 86400);
 
   db.run(
@@ -261,7 +295,7 @@ app.post('/admin/update-script', (req, res) => {
   if (req.body.lua_script) {
     db.run(
       "INSERT INTO scripts (name, content, updated_at) VALUES (?, ?, ?)",
-      ["Text Editor Paste", req.body.lua_script, new Date().toISOString()],
+      ["Editor Payload", req.body.lua_script, new Date().toISOString()],
       () => res.redirect('/')
     );
   } else {
@@ -274,7 +308,8 @@ app.post('/admin/upload-script-file', upload.single('script_file'), (req, res) =
   if (!req.file) return res.redirect('/');
 
   const fileName = req.file.originalname;
-  const content = req.file.buffer.toString('utf8');
+  // Clean potential UTF-8 BOM characters that break Lua execution
+  const content = req.file.buffer.toString('utf8').replace(/^\uFEFF/, '');
 
   db.run(
     "INSERT INTO scripts (name, content, updated_at) VALUES (?, ?, ?)",
