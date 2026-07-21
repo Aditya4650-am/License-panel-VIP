@@ -268,6 +268,7 @@
 
         .btn-copy { background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); }
         .btn-revoke { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); margin-left: 5px; }
+        .btn-delete { background: rgba(255, 42, 95, 0.25); color: var(--neon-red); }
 
         @media (max-width: 650px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -313,6 +314,25 @@
             <textarea id="scriptContent" placeholder="Script payload contents will appear here..."></textarea>
             
             <button class="btn" onclick="uploadScript()">📤 Deploy Script Payload</button>
+        </div>
+
+        <!-- NEW SCRIPT MANAGEMENT SECTION -->
+        <div class="card">
+            <h2>📦 Saved Scripts Database</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Version</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scriptsTableBody"></tbody>
+                </table>
+            </div>
         </div>
 
         <div class="card">
@@ -403,6 +423,34 @@
             reader.readAsText(file);
         }
 
+        // FIXED COPY FUNCTION FOR ALL BROWSERS / HTTP ENVIRONMENTS
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert("📋 Copied to clipboard: " + text);
+                }).catch(err => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert("📋 Copied to clipboard: " + text);
+            } catch (err) {
+                alert("❌ Failed to copy automatically. Key: " + text);
+            }
+            document.body.removeChild(textArea);
+        }
+
         async function fetchDashboard() {
             try {
                 const res = await fetch('/api/admin/dashboard');
@@ -411,70 +459,140 @@
                 document.getElementById('totalKeys').innerText = data.totalKeys;
                 document.getElementById('activeKeys').innerText = data.activeKeys;
 
+                // Populate Dropdown
                 const select = document.getElementById('scriptSelect');
                 select.innerHTML = '<option value="">Select Script Payload</option>';
                 data.scripts.forEach(s => select.innerHTML += `<option value="${s.id}">${s.title} (v${s.version})</option>`);
 
+                // Populate Scripts Table
+                const scriptsTbody = document.getElementById('scriptsTableBody');
+                scriptsTbody.innerHTML = '';
+                if(data.scripts.length === 0) {
+                    scriptsTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No scripts saved yet.</td></tr>`;
+                } else {
+                    data.scripts.forEach(s => {
+                        scriptsTbody.innerHTML += `<tr>
+                            <td><code>${s.id}</code></td>
+                            <td>${s.title}</td>
+                            <td>${s.category || 'General'}</td>
+                            <td>v${s.version || '1.0'}</td>
+                            <td>
+                                <button class="btn-action btn-delete" onclick="deleteScript('${s.id}')">🗑️ Delete</button>
+                            </td>
+                        </tr>`;
+                    });
+                }
+
+                // Populate Keys Table
                 const tbody = document.getElementById('keysTableBody');
                 tbody.innerHTML = '';
-                data.keys.forEach(k => {
-                    const badge = k.is_active ? `<span class="badge badge-active">🟢 Active</span>` : `<span class="badge badge-inactive">🔴 Revoked</span>`;
-                    const revokeBtn = k.is_active ? `<button class="btn-action btn-revoke" onclick="revokeKey('${k.key_code}')">🚫 Revoke</button>` : '';
-                    tbody.innerHTML += `<tr>
-                        <td><code>${k.key_code}</code></td>
-                        <td>${k.script_name || 'Unlinked'}</td>
-                        <td>${k.duration_days >= 30000 ? '👑 Lifetime' : k.duration_days + ' Days'}</td>
-                        <td>${k.device_limit}</td>
-                        <td>${badge}</td>
-                        <td>
-                            <button class="btn-action btn-copy" onclick="navigator.clipboard.writeText('${k.key_code}')">📋 Copy</button>
-                            ${revokeBtn}
-                        </td>
-                    </tr>`;
-                });
-            } catch (err) { console.error(err); }
+                if(data.keys.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No keys generated yet.</td></tr>`;
+                } else {
+                    data.keys.forEach(k => {
+                        const badge = k.is_active ? `<span class="badge badge-active">🟢 Active</span>` : `<span class="badge badge-inactive">🔴 Revoked</span>`;
+                        const revokeBtn = k.is_active ? `<button class="btn-action btn-revoke" onclick="revokeKey('${k.key_code}')">🚫 Revoke</button>` : '';
+                        tbody.innerHTML += `<tr>
+                            <td><code>${k.key_code}</code></td>
+                            <td>${k.script_name || 'Unlinked'}</td>
+                            <td>${k.duration_days >= 30000 ? '👑 Lifetime' : k.duration_days + ' Days'}</td>
+                            <td>${k.device_limit}</td>
+                            <td>${badge}</td>
+                            <td>
+                                <button class="btn-action btn-copy" onclick="copyToClipboard('${k.key_code}')">📋 Copy</button>
+                                ${revokeBtn}
+                            </td>
+                        </tr>`;
+                    });
+                }
+            } catch (err) { console.error("Error loading dashboard:", err); }
         }
 
         async function uploadScript() {
-            const title = document.getElementById('scriptTitle').value;
+            const title = document.getElementById('scriptTitle').value.trim();
             const content = document.getElementById('scriptContent').value;
             if(!title || !content) return alert("⚠️ Please provide Title and Payload Code!");
 
-            const res = await fetch('/api/admin/scripts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, category: document.getElementById('scriptCategory').value, version: document.getElementById('scriptVersion').value, content })
-            });
-            const data = await res.json();
-            if(data.success) { alert("✅ Script Uploaded!"); fetchDashboard(); }
+            try {
+                const res = await fetch('/api/admin/scripts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        title, 
+                        category: document.getElementById('scriptCategory').value.trim(), 
+                        version: document.getElementById('scriptVersion').value.trim(), 
+                        content 
+                    })
+                });
+                const data = await res.json();
+                if(data.success) { 
+                    alert("✅ Script Uploaded Successfully!"); 
+                    document.getElementById('scriptTitle').value = '';
+                    document.getElementById('scriptContent').value = '';
+                    document.getElementById('fileStatusText').innerText = "📁 Click to Select Script File (.lua / .txt)";
+                    fetchDashboard(); 
+                } else {
+                    alert("❌ Failed to upload: " + (data.error || "Unknown error"));
+                }
+            } catch(err) {
+                alert("❌ Connection error while uploading script.");
+            }
+        }
+
+        async function deleteScript(scriptId) {
+            if(!confirm("Are you sure you want to delete this script?")) return;
+            try {
+                const res = await fetch('/api/admin/scripts/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scriptId })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert("🗑️ Script Deleted Successfully!");
+                    fetchDashboard();
+                } else {
+                    alert("❌ Failed to delete script: " + (data.error || "Unknown error"));
+                }
+            } catch(err) {
+                alert("❌ Connection error while deleting script.");
+            }
         }
 
         async function generateKey() {
             const scriptId = document.getElementById('scriptSelect').value;
             if(!scriptId) return alert("⚠️ Select a Target Script first!");
 
-            const res = await fetch('/api/admin/keys', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    scriptId,
-                    durationType: document.getElementById('durationType').value,
-                    deviceLimit: document.getElementById('deviceLimit').value,
-                    customKey: document.getElementById('customKey').value
-                })
-            });
-            const data = await res.json();
-            if(data.success) { alert("✨ Key Generated:\n" + data.keyCode); fetchDashboard(); }
+            try {
+                const res = await fetch('/api/admin/keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        scriptId,
+                        durationType: document.getElementById('durationType').value,
+                        deviceLimit: document.getElementById('deviceLimit').value,
+                        customKey: document.getElementById('customKey').value
+                    })
+                });
+                const data = await res.json();
+                if(data.success) { alert("✨ Key Generated:\n" + data.keyCode); fetchDashboard(); }
+            } catch(err) {
+                alert("❌ Connection error while generating key.");
+            }
         }
 
         async function revokeKey(keyCode) {
             if(!confirm("Revoke key: " + keyCode + "?")) return;
-            await fetch('/api/admin/keys/revoke', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ keyCode })
-            });
-            fetchDashboard();
+            try {
+                await fetch('/api/admin/keys/revoke', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ keyCode })
+                });
+                fetchDashboard();
+            } catch(err) {
+                alert("❌ Connection error while revoking key.");
+            }
         }
 
         fetchDashboard();
