@@ -46,13 +46,12 @@ function initTables() {
             hwid TEXT
         )`);
 
-        // Performance Indexes for ultra-fast lookup speed
         db.run(`CREATE INDEX IF NOT EXISTS idx_keys_code ON keys(key_code)`);
         db.run(`CREATE INDEX IF NOT EXISTS idx_devices_key ON devices(key_code)`);
     });
 }
 
-// Global No-Cache Middleware
+// Anti-cache Headers for Verification Routes
 app.use('/api', (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -106,7 +105,7 @@ app.post('/api/admin/scripts', (req, res) => {
     );
 });
 
-// Delete Script Endpoint (With Cascade Clean-up)
+// Delete Script Endpoint
 app.post('/api/admin/scripts/delete', (req, res) => {
     const { scriptId } = req.body;
     if (!scriptId) return res.status(400).json({ error: "Script ID is required!" });
@@ -172,7 +171,7 @@ app.post('/api/admin/keys/revoke', (req, res) => {
     });
 });
 
-// Optimized Fast Verification Endpoint
+// Key Verification Endpoint
 app.post('/api/verify', (req, res) => {
     const { key, hwid } = req.body;
     if (!key || !hwid) {
