@@ -1,3 +1,4 @@
+
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -5,7 +6,9 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-app.use(express.json());
+// Increased body limit to allow long Lua script uploads
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -42,16 +45,16 @@ db.serialize(() => {
 
 // Admin: Get Dashboard Stats & Lists
 app.get('/api/admin/dashboard', (req, res) => {
-    db.all(`SELECT * FROM scripts`, [], (err, scripts) => {
-        db.all(`SELECT keys.*, scripts.title as script_name FROM keys LEFT JOIN scripts ON keys.script_id = scripts.id`, [], (err2, keys) => {
+    db.all(`SELECT * FROM scripts ORDER BY created_at DESC`, [], (err, scripts) => {
+        db.all(`SELECT keys.*, scripts.title as script_name FROM keys LEFT JOIN scripts ON keys.script_id = scripts.id ORDER BY keys.created_at DESC`, [], (err2, keys) => {
             db.get(`SELECT COUNT(*) as count FROM devices`, [], (err3, devices) => {
                 res.json({
-                    totalScripts: scripts.length,
-                    totalKeys: keys.length,
-                    activeKeys: keys.filter(k => k.is_active).length,
+                    totalScripts: scripts ? scripts.length : 0,
+                    totalKeys: keys ? keys.length : 0,
+                    activeKeys: keys ? keys.filter(k => k.is_active).length : 0,
                     totalDevices: devices ? devices.count : 0,
-                    scripts,
-                    keys
+                    scripts: scripts || [],
+                    keys: keys || []
                 });
             });
         });
@@ -61,7 +64,9 @@ app.get('/api/admin/dashboard', (req, res) => {
 // Admin: Upload Script
 app.post('/api/admin/scripts', (req, res) => {
     const { title, category, version, content } = req.body;
-    if (!title || !content) return res.status(400).json({ error: "Missing required fields" });
+    if (!title || !content) {
+        return res.status(400).json({ error: "Script Title and Content are required!" });
+    }
 
     const scriptId = crypto.randomUUID();
     db.run(`INSERT INTO scripts (id, title, category, version, content) VALUES (?, ?, ?, ?, ?)`,
@@ -76,7 +81,7 @@ app.post('/api/admin/scripts', (req, res) => {
 // Admin: Generate Key
 app.post('/api/admin/keys', (req, res) => {
     const { scriptId, durationDays = 30, deviceLimit = 1, customKey } = req.body;
-    if (!scriptId) return res.status(400).json({ error: "Please select a script" });
+    if (!scriptId) return res.status(400).json({ error: "Please select a target script!" });
 
     const keyCode = customKey && customKey.trim() !== "" 
         ? customKey.trim() 
@@ -85,7 +90,7 @@ app.post('/api/admin/keys', (req, res) => {
     db.run(`INSERT INTO keys (key_code, script_id, duration_days, device_limit) VALUES (?, ?, ?, ?)`,
         [keyCode, scriptId, durationDays, deviceLimit],
         function(err) {
-            if (err) return res.status(500).json({ error: "Key already exists or invalid script" });
+            if (err) return res.status(500).json({ error: "Key already exists or invalid script selection!" });
             res.json({ success: true, keyCode });
         }
     );
@@ -99,12 +104,10 @@ app.post('/api/verify', (req, res) => {
     db.get(`SELECT * FROM keys WHERE key_code = ? AND is_active = 1`, [key], (err, keyRecord) => {
         if (err || !keyRecord) return res.status(401).json({ status: "error", message: "Invalid license key!" });
 
-        // Check if key is tied to this specific script (optional check)
         if (scriptId && keyRecord.script_id !== scriptId) {
             return res.status(403).json({ status: "error", message: "This key belongs to a different script!" });
         }
 
-        // Activate expiry on first use
         if (!keyRecord.expires_at) {
             const expireDate = new Date();
             expireDate.setDate(expireDate.getDate() + keyRecord.duration_days);
@@ -113,7 +116,6 @@ app.post('/api/verify', (req, res) => {
             return res.status(403).json({ status: "error", message: "License key has expired!" });
         }
 
-        // Check Device Limit & Bind HWID
         db.all(`SELECT hwid FROM devices WHERE key_code = ?`, [key], (err2, devices) => {
             const registeredHwids = devices.map(d => d.hwid);
             if (!registeredHwids.includes(hwid)) {
@@ -123,7 +125,6 @@ app.post('/api/verify', (req, res) => {
                 db.run(`INSERT INTO devices (key_code, hwid) VALUES (?, ?)`, [key, hwid]);
             }
 
-            // Return protected script code
             db.get(`SELECT content FROM scripts WHERE id = ?`, [keyRecord.script_id], (err3, script) => {
                 if (err3 || !script) return res.status(404).json({ status: "error", message: "Linked script payload not found!" });
                 res.json({ status: "success", content: script.content });
@@ -137,4 +138,4 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Professional Zenitsu Panel running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Zenitsu & Evil VIP Server running on port ${PORT}`));
