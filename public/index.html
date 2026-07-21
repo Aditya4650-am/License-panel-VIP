@@ -7,17 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #030a0a;
-            --neon-green: #00ffaa;
-            --neon-cyan: #00e5ff;
-            --neon-emerald: #00b377;
-            --neon-gold: #ffcc00;
+            --bg-dark: #02080a;
+            --neon-blue: #00f0ff;
+            --neon-green: #00ff88;
+            --dark-emerald: #003b2b;
+            --neon-gold: #ffd700;
             --neon-red: #ff2a5f;
-            --dark-surface: #061412;
-            --glass-bg: rgba(6, 20, 18, 0.75);
-            --glass-border: rgba(0, 255, 170, 0.25);
-            --text-main: #e6fcf5;
-            --text-muted: #527a71;
+            --dark-surface: rgba(4, 20, 22, 0.75);
+            --glass-border: rgba(0, 240, 255, 0.3);
+            --glass-border-green: rgba(0, 255, 136, 0.4);
+            --text-main: #e6ffff;
+            --text-muted: #538d8d;
         }
 
         * {
@@ -25,7 +25,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Rajdhani', sans-serif;
-            transition: all 0.25s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         body {
@@ -35,6 +35,7 @@
             padding: 25px 15px;
             overflow-x: hidden;
             position: relative;
+            perspective: 1000px;
         }
 
         #bgCanvas {
@@ -56,19 +57,25 @@
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.3rem;
+            font-size: 2.5rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-cyan) 50%, #0088ff 100%);
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 50%, #0066ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 25px rgba(0, 255, 170, 0.5);
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.4)); }
+            100% { filter: drop-shadow(0 0 25px rgba(0, 255, 136, 0.8)); }
         }
 
         .live-clock {
@@ -76,32 +83,39 @@
             align-items: center;
             gap: 8px;
             margin-top: 12px;
-            padding: 6px 20px;
-            background: rgba(3, 10, 10, 0.9);
+            padding: 8px 24px;
+            background: rgba(2, 12, 15, 0.9);
             border: 1px solid var(--neon-green);
             border-radius: 30px;
             color: var(--neon-green);
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
             font-weight: 700;
-            box-shadow: 0 0 15px rgba(0, 255, 170, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.25), inset 0 0 10px rgba(0, 255, 136, 0.1);
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 20px;
+            background: var(--dark-surface);
+            border: 1px solid var(--glass-border-green);
+            border-radius: 16px;
+            padding: 22px;
             text-align: center;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 255, 170, 0.05);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 136, 0.05);
+            transform-style: preserve-3d;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px) rotateX(4deg) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.25), inset 0 0 25px rgba(0, 255, 136, 0.15);
+            border-color: var(--neon-blue);
         }
 
         .stat-card h3 {
@@ -114,30 +128,36 @@
 
         .stat-card p {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 900;
-            color: var(--neon-green);
+            color: var(--neon-blue);
             margin-top: 6px;
-            text-shadow: 0 0 15px var(--neon-green);
+            text-shadow: 0 0 15px var(--neon-blue);
         }
 
         .card {
-            background: var(--glass-bg);
+            background: var(--dark-surface);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 25px;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 255, 170, 0.03);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 240, 255, 0.03);
+            transform-style: preserve-3d;
+        }
+
+        .card:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 25px 55px rgba(0, 255, 136, 0.15), inset 0 0 30px rgba(0, 255, 136, 0.05);
         }
 
         .card h2 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             color: var(--neon-green);
-            margin-bottom: 18px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+            margin-bottom: 20px;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
         }
 
         label {
@@ -145,85 +165,93 @@
             font-size: 0.9rem;
             font-weight: 700;
             color: var(--text-muted);
-            margin-top: 12px;
+            margin-top: 14px;
             margin-bottom: 6px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         input[type="text"], input[type="number"], select, textarea {
             width: 100%;
-            padding: 13px 16px;
-            margin-bottom: 14px;
-            background: rgba(3, 10, 10, 0.9);
-            border: 1px solid rgba(0, 255, 170, 0.25);
-            border-radius: 10px;
-            color: var(--text-main);
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            background: rgba(2, 10, 14, 0.95);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 12px;
+            color: var(--neon-blue);
             font-size: 15px;
             font-weight: 600;
             outline: none;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
         }
 
         input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
             border-color: var(--neon-green);
-            box-shadow: 0 0 12px rgba(0, 255, 170, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3), inset 0 0 10px rgba(0, 255, 136, 0.1);
+            color: var(--text-main);
         }
 
         .file-upload-box {
-            border: 2px dashed rgba(0, 255, 170, 0.4);
-            background: rgba(3, 10, 10, 0.6);
-            border-radius: 12px;
-            padding: 20px;
+            border: 2px dashed rgba(0, 255, 136, 0.4);
+            background: rgba(2, 15, 18, 0.6);
+            border-radius: 14px;
+            padding: 24px;
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .file-upload-box:hover {
-            border-color: var(--neon-green);
-            background: rgba(0, 255, 170, 0.08);
-            box-shadow: 0 0 15px rgba(0, 255, 170, 0.2);
+            border-color: var(--neon-blue);
+            background: rgba(0, 240, 255, 0.08);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
         }
 
         .file-upload-box p {
             color: var(--neon-green);
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
 
         input[type="file"] { display: none; }
 
         textarea {
-            height: 120px;
+            height: 130px;
             font-family: 'JetBrains Mono', monospace;
             resize: vertical;
         }
 
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             text-transform: uppercase;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-emerald) 100%);
-            color: #030a0a;
-            box-shadow: 0 6px 20px rgba(0, 255, 170, 0.3);
+            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 100%);
+            color: #02080a;
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+            letter-spacing: 1px;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 255, 170, 0.5);
-            background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-green) 100%);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 35px rgba(0, 240, 255, 0.6);
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-green) 100%);
         }
 
         .table-responsive {
             overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 255, 170, 0.2);
+            border-radius: 14px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         table {
@@ -233,82 +261,91 @@
         }
 
         th, td {
-            padding: 14px 16px;
+            padding: 16px 18px;
             text-align: left;
-            border-bottom: 1px solid rgba(0, 255, 170, 0.08);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.08);
         }
 
         th {
-            background: rgba(3, 10, 10, 0.95);
+            background: rgba(2, 12, 16, 0.95);
             font-family: 'Orbitron', sans-serif;
-            color: var(--neon-green);
+            color: var(--neon-blue);
             font-weight: 700;
             font-size: 12px;
+            letter-spacing: 1px;
         }
 
         code {
             font-family: 'JetBrains Mono', monospace;
-            color: var(--neon-cyan);
-            background: rgba(0, 229, 255, 0.1);
-            padding: 4px 8px;
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.1);
+            padding: 5px 10px;
             border-radius: 6px;
-            border: 1px solid rgba(0, 229, 255, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.25);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.15);
         }
 
         .badge {
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-family: 'Orbitron', sans-serif;
             font-size: 11px;
             font-weight: 700;
         }
 
-        .badge-active { background: rgba(0, 255, 170, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); }
-        .badge-inactive { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); border: 1px solid var(--neon-red); }
+        .badge-active { background: rgba(0, 255, 136, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+        .badge-inactive { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); border: 1px solid var(--neon-red); box-shadow: 0 0 10px rgba(255, 42, 95, 0.3); }
 
         .btn-action {
-            padding: 6px 12px;
+            padding: 7px 14px;
             font-size: 12px;
             font-weight: 700;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             border: none;
         }
 
-        .btn-copy { background: rgba(0, 229, 255, 0.15); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
+        .btn-copy { background: rgba(0, 240, 255, 0.15); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+        .btn-copy:hover { background: var(--neon-blue); color: #02080a; box-shadow: 0 0 15px var(--neon-blue); }
+
         .btn-revoke { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); border: 1px solid var(--neon-red); margin-left: 5px; }
-        .btn-delete { background: rgba(255, 42, 95, 0.25); color: var(--neon-red); border: 1px solid var(--neon-red); }
-        .btn-view { background: rgba(0, 255, 170, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); margin-right: 5px; }
+        .btn-revoke:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px var(--neon-red); }
+
+        .btn-delete { background: rgba(255, 42, 95, 0.2); color: var(--neon-red); border: 1px solid var(--neon-red); }
+        .btn-delete:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px var(--neon-red); }
+
+        .btn-view { background: rgba(0, 255, 136, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); margin-right: 5px; }
+        .btn-view:hover { background: var(--neon-green); color: #02080a; box-shadow: 0 0 15px var(--neon-green); }
 
         .script-preview-modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(3, 10, 10, 0.9);
+            background: rgba(2, 8, 10, 0.92);
             z-index: 999;
             align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
         }
 
         .script-preview-content {
-            background: var(--dark-surface);
+            background: rgba(3, 16, 20, 0.95);
             border: 1px solid var(--neon-green);
             width: 90%; max-width: 800px; max-height: 80vh;
-            border-radius: 16px; padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 255, 170, 0.3);
+            border-radius: 20px; padding: 25px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.35);
             display: flex; flex-direction: column;
         }
 
         .script-preview-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; border-bottom: 1px solid rgba(0, 255, 170, 0.2); padding-bottom: 10px;
+            margin-bottom: 15px; border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding-bottom: 10px;
         }
 
         .script-preview-body {
-            background: #020606; border-radius: 8px; padding: 15px;
+            background: #010507; border-radius: 10px; padding: 18px;
             overflow-y: auto; font-family: 'JetBrains Mono', monospace;
-            color: var(--neon-green); font-size: 13px; white-space: pre-wrap;
-            flex-grow: 1; border: 1px solid rgba(0, 255, 170, 0.1);
+            color: var(--neon-blue); font-size: 13px; white-space: pre-wrap;
+            flex-grow: 1; border: 1px solid rgba(0, 240, 255, 0.15);
         }
 
         @media (max-width: 650px) {
@@ -357,7 +394,7 @@
             <button class="btn" onclick="uploadScript()">📤 Deploy Script Payload</button>
         </div>
 
-        <!-- PROPER SCRIPT DASHBOARD -->
+        <!-- SCRIPT DASHBOARD -->
         <div class="card">
             <h2>📦 Saved Scripts Dashboard</h2>
             <div class="table-responsive">
@@ -419,7 +456,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT INSPECTOR MODAL -->
+    <!-- SCRIPT PREVIEW MODAL -->
     <div id="previewModal" class="script-preview-modal">
         <div class="script-preview-content">
             <div class="script-preview-header">
@@ -431,14 +468,14 @@
     </div>
 
     <script>
-        // 3D INTERACTIVE PARTICLE MESH BACKGROUND
+        // DYNAMIC 3D NEON MESH & PARTICLE ENGINE
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
-        let mouse = { x: null, y: null, radius: 150 };
+        let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
         window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
 
         function resizeCanvas() { 
@@ -450,43 +487,46 @@
 
         class Particle3D {
             constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.z = Math.random() * canvas.width;
-                this.radius = Math.random() * 2 + 1;
-                this.vx = (Math.random() - 0.5) * 1.2;
-                this.vy = (Math.random() - 0.5) * 1.2;
-                this.vz = (Math.random() - 0.5) * 1.2;
+                this.reset();
+            }
+
+            reset() {
+                this.x = (Math.random() - 0.5) * canvas.width * 1.5;
+                this.y = (Math.random() - 0.5) * canvas.height * 1.5;
+                this.z = Math.random() * 1000 + 1;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.color = Math.random() > 0.5 ? '#00f0ff' : '#00ff88';
             }
 
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.z += this.vz;
+                this.z -= 0.5;
 
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                if (this.z < 0 || this.z > canvas.width) this.vz *= -1;
+                if (this.z <= 0) this.reset();
             }
 
             draw() {
-                let scale = 300 / (300 + this.z);
-                let x2d = (this.x - canvas.width / 2) * scale + canvas.width / 2;
-                let y2d = (this.y - canvas.height / 2) * scale + canvas.height / 2;
-                let r2d = this.radius * scale;
+                let focalLength = 400;
+                let scale = focalLength / (focalLength + this.z);
+                let x2d = (this.x + (mouse.x - canvas.width / 2) * 0.1) * scale + canvas.width / 2;
+                let y2d = (this.y + (mouse.y - canvas.height / 2) * 0.1) * scale + canvas.height / 2;
+                let r2d = Math.max(0.5, 3 * scale);
 
                 ctx.beginPath();
-                ctx.arc(x2d, y2d, Math.max(0.1, r2d), 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 255, 170, ${scale * 0.8})`;
-                ctx.shadowBlur = 10 * scale;
-                ctx.shadowColor = '#00ffaa';
+                ctx.arc(x2d, y2d, r2d, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 12 * scale;
+                ctx.shadowColor = this.color;
                 ctx.fill();
             }
         }
 
-        const particles = Array.from({ length: 65 }, () => new Particle3D());
+        const particleCount = 75;
+        const particles = Array.from({ length: particleCount }, () => new Particle3D());
 
-        function animate3DMesh() {
+        function render3DEngine() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let i = 0; i < particles.length; i++) {
@@ -496,29 +536,27 @@
                 for (let j = i + 1; j < particles.length; j++) {
                     let dx = particles[i].x - particles[j].x;
                     let dy = particles[i].y - particles[j].y;
-                    let dz = particles[i].z - particles[j].z;
-                    let dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    let dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < 180) {
-                        let scale = 300 / (300 + (particles[i].z + particles[j].z) / 2);
+                    if (dist < 150) {
+                        let scale = 400 / (400 + (particles[i].z + particles[j].z) / 2);
+                        let x1 = (particles[i].x + (mouse.x - canvas.width / 2) * 0.1) * scale + canvas.width / 2;
+                        let y1 = (particles[i].y + (mouse.y - canvas.height / 2) * 0.1) * scale + canvas.height / 2;
+                        let x2 = (particles[j].x + (mouse.x - canvas.width / 2) * 0.1) * scale + canvas.width / 2;
+                        let y2 = (particles[j].y + (mouse.y - canvas.height / 2) * 0.1) * scale + canvas.height / 2;
+
                         ctx.beginPath();
-                        ctx.moveTo(
-                            (particles[i].x - canvas.width / 2) * scale + canvas.width / 2,
-                            (particles[i].y - canvas.height / 2) * scale + canvas.height / 2
-                        );
-                        ctx.lineTo(
-                            (particles[j].x - canvas.width / 2) * scale + canvas.width / 2,
-                            (particles[j].y - canvas.height / 2) * scale + canvas.height / 2
-                        );
-                        ctx.strokeStyle = `rgba(0, 229, 255, ${(1 - dist / 180) * 0.25 * scale})`;
-                        ctx.lineWidth = 0.8 * scale;
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.strokeStyle = `rgba(0, 255, 136, ${(1 - dist / 150) * 0.2 * scale})`;
+                        ctx.lineWidth = 1 * scale;
                         ctx.stroke();
                     }
                 }
             }
-            requestAnimationFrame(animate3DMesh);
+            requestAnimationFrame(render3DEngine);
         }
-        animate3DMesh();
+        render3DEngine();
 
         function updateClock() {
             document.getElementById('liveClock').innerText = "🕒 System Time: " + new Date().toLocaleString();
