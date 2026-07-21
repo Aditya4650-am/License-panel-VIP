@@ -3,49 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZENITSU VIP - Admin Panel</title>
+    <title>ZENITSU VIP - Premium Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: #1e293b; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1, h2 { color: #38bdf8; text-align: center; margin-bottom: 5px; }
-        .live-clock { text-align: center; color: #34d399; font-size: 15px; font-weight: bold; margin-bottom: 20px; background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid #334155; }
-        .card { background: #334155; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-        input, select, textarea, button { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 15px; background: #0f172a; border: 1px solid #475569; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        textarea { height: 120px; font-family: monospace; }
-        button { background: #0284c7; font-weight: bold; cursor: pointer; border: none; }
-        button:hover { background: #0369a1; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-        th, td { border: 1px solid #475569; padding: 8px; text-align: left; }
-        th { background: #0f172a; color: #38bdf8; }
-        .stats { display: flex; justify-content: space-around; text-align: center; }
-        .stat-box { background: #0f172a; padding: 10px; border-radius: 5px; width: 30%; border: 1px solid #38bdf8; }
+        :root {
+            --bg-primary: #0a0e17;
+            --card-bg: rgba(22, 31, 48, 0.7);
+            --card-border: rgba(56, 189, 248, 0.2);
+            --accent-cyan: #38bdf8;
+            --accent-gold: #fbbf24;
+            --accent-red: #f43f5e;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-primary) 70%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .live-clock {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 20px;
+            color: #34d399;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+            backdrop-filter: blur(8px);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 22px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 15px 35px -10px rgba(56, 189, 248, 0.2);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            color: var(--accent-cyan);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--card-border);
+            padding: 18px;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stat-box h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-box p {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-top: 5px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            background: rgba(10, 14, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+        }
+
+        textarea {
+            height: 110px;
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(2, 132, 199, 0.5);
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+        }
+
+        .btn-action {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-copy {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-copy:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .btn-revoke {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            margin-left: 4px;
+        }
+
+        .btn-revoke:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            background: rgba(10, 14, 23, 0.9);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-gold);
+            background: rgba(251, 191, 36, 0.1);
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-active { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .badge-inactive { background: rgba(244, 63, 94, 0.2); color: var(--accent-red); }
+
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚡ ZENITSU VIP Control Panel ⚡</h1>
-        <div id="liveClock" class="live-clock">🕒 Loading precise time...</div>
+        <div class="header">
+            <h1>⚡ ZENITSU VIP CONTROL PANEL ⚡</h1>
+            <div id="liveClock" class="live-clock">🕒 System Time: Loading...</div>
+        </div>
         
-        <div class="card stats">
-            <div class="stat-box"><h3>📦 Scripts</h3><p id="totalScripts">0</p></div>
-            <div class="stat-box"><h3>🔑 Total Keys</h3><p id="totalKeys">0</p></div>
-            <div class="stat-box"><h3>🟢 Active Keys</h3><p id="activeKeys">0</p></div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <h3>📦 Total Scripts</h3>
+                <p id="totalScripts">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>🔑 Generated Keys</h3>
+                <p id="totalKeys">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>🟢 Active Licenses</h3>
+                <p id="activeKeys">0</p>
+            </div>
         </div>
 
         <div class="card">
-            <h2>🚀 Upload New Script</h2>
+            <h2>🚀 Upload New Script Payload</h2>
             <input type="text" id="scriptTitle" placeholder="Script Title (e.g., Township Elite v4)">
             <input type="text" id="scriptCategory" placeholder="Category" value="Township">
             <input type="text" id="scriptVersion" placeholder="Version" value="4.0">
-            <textarea id="scriptContent" placeholder="Paste your raw Lua script code here..."></textarea>
-            <button onclick="uploadScript()">📤 Upload Script Payload</button>
+            <textarea id="scriptContent" placeholder="Paste your raw Lua script payload code here..."></textarea>
+            <button class="btn" onclick="uploadScript()">📤 Deploy Script Payload</button>
         </div>
 
         <div class="card">
-            <h2>🔑 Generate License Key</h2>
+            <h2>🔑 License Key Generator</h2>
+            <label>Select Target Script Payload:</label>
             <select id="scriptSelect"></select>
             
-            <label>⏳ Select Duration Package:</label>
+            <label>Select Access Duration:</label>
             <select id="durationType">
                 <option value="7days">⚡ 7 Days Access</option>
                 <option value="1month" selected>🔥 1 Month (30 Days)</option>
@@ -53,22 +311,27 @@
                 <option value="lifetime">👑 Lifetime Access</option>
             </select>
 
+            <label>Device HWID Limit:</label>
             <input type="number" id="deviceLimit" placeholder="Device Limit" value="1">
-            <input type="text" id="customKey" placeholder="Custom Key (Optional - leave blank for auto VIP-XXXX)">
-            <button onclick="generateKey()">✨ Generate VIP Key</button>
+            
+            <label>Custom Key (Optional):</label>
+            <input type="text" id="customKey" placeholder="Leave blank for automatic VIP-XXXX generation">
+            
+            <button class="btn" onclick="generateKey()">✨ Generate VIP Access Key</button>
         </div>
 
         <div class="card">
-            <h2>📊 Keys & Database Logs</h2>
-            <div style="overflow-x:auto;">
+            <h2>📊 Active Database & Managed Keys</h2>
+            <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>🔑 Key Code</th>
-                            <th>📜 Script Name</th>
-                            <th>⏳ Duration</th>
-                            <th>📱 Limit</th>
-                            <th>⚡ Status</th>
+                            <th>Key Code</th>
+                            <th>Linked Script</th>
+                            <th>Duration</th>
+                            <th>Limit</th>
+                            <th>Status</th>
+                            <th>Quick Actions</th>
                         </tr>
                     </thead>
                     <tbody id="keysTableBody"></tbody>
@@ -78,7 +341,6 @@
     </div>
 
     <script>
-        // Professional Live Clock with Emojis
         function updateClock() {
             const now = new Date();
             const options = { 
@@ -119,16 +381,50 @@
                     else if(k.duration_days === 365) durationText = "💎 1 Year";
                     else if(k.duration_days === 7) durationText = "⚡ 7 Days";
 
+                    const statusBadge = k.is_active 
+                        ? `<span class="badge badge-active">🟢 Active</span>` 
+                        : `<span class="badge badge-inactive">🔴 Revoked</span>`;
+
+                    const revokeBtn = k.is_active 
+                        ? `<button class="btn-action btn-revoke" onclick="revokeKey('${k.key_code}')">🚫 Revoke</button>` 
+                        : `<button class="btn-action" disabled style="opacity:0.4;">Cancelled</button>`;
+
                     tbody.innerHTML += `<tr>
                         <td><code>${k.key_code}</code></td>
-                        <td>${k.script_name}</td>
+                        <td>${k.script_name || 'Unlinked'}</td>
                         <td>${durationText}</td>
                         <td>${k.device_limit}</td>
-                        <td>${k.is_active ? '🟢 Active' : '🔴 Inactive'}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn-action btn-copy" onclick="copyKey('${k.key_code}')">📋 Copy</button>
+                            ${revokeBtn}
+                        </td>
                     </tr>`;
                 });
             } catch (err) {
                 console.error("Error loading dashboard data", err);
+            }
+        }
+
+        function copyKey(key) {
+            navigator.clipboard.writeText(key);
+            alert("📋 Copied Key to Clipboard:\n" + key);
+        }
+
+        async function revokeKey(keyCode) {
+            if(!confirm("Are you sure you want to cancel / revoke key:\n" + keyCode + "?")) return;
+
+            const res = await fetch('/api/admin/keys/revoke', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keyCode })
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("🚫 Key Revoked Successfully!");
+                fetchDashboard();
+            } else {
+                alert("❌ Error: " + data.error);
             }
         }
 
@@ -165,7 +461,7 @@
             });
             const data = await res.json();
             if(data.success) {
-                alert("✨ Key Generated Successfully: " + data.keyCode);
+                alert("✨ VIP Key Generated Successfully:\n" + data.keyCode);
                 fetchDashboard();
             } else {
                 alert("❌ Error: " + data.error);
