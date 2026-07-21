@@ -10,18 +10,15 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Connect to SQLite database (Persistent storage setup)
 const dbFile = path.join(__dirname, 'database.sqlite');
 const db = new sqlite3.Database(dbFile, (err) => {
-    if (err) {
-        console.error('Error opening database:', err.message);
-    } else {
-        console.log('Connected to persistent SQLite database.');
+    if (err) console.error('Database connection error:', err.message);
+    else {
+        console.log('Connected to SQLite persistent database.');
         initTables();
     }
 });
 
-// Initialize database schema tables
 function initTables() {
     db.run(`CREATE TABLE IF NOT EXISTS scripts (
         id TEXT PRIMARY KEY,
@@ -49,7 +46,7 @@ function initTables() {
     )`);
 }
 
-// 1. ADMIN DASHBOARD API: Fetch statistics, active keys, and scripts
+// Admin Dashboard Stats
 app.get('/api/admin/dashboard', (req, res) => {
     db.all(`SELECT * FROM scripts ORDER BY created_at DESC`, [], (err, scripts) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -66,10 +63,10 @@ app.get('/api/admin/dashboard', (req, res) => {
                 if (err) return res.status(500).json({ error: err.message });
 
                 res.json({
-                    totalScripts: scripts.length,
-                    totalKeys: keys.length,
-                    activeKeys: keys.filter(k => k.is_active === 1).length,
-                    totalDevices: devices.length,
+                    totalScripts: (scripts || []).length,
+                    totalKeys: (keys || []).length,
+                    activeKeys: (keys || []).filter(k => k.is_active === 1).length,
+                    totalDevices: (devices || []).length,
                     scripts: scripts || [],
                     keys: keys || []
                 });
@@ -78,10 +75,10 @@ app.get('/api/admin/dashboard', (req, res) => {
     });
 });
 
-// 2. ADMIN SCRIPT UPLOAD API
+// Upload Script Payload
 app.post('/api/admin/scripts', (req, res) => {
     const { title, category, version, content } = req.body;
-    if (!title || !content) return res.status(400).json({ error: "Title and Content are required!" });
+    if (!title || !content) return res.status(400).json({ error: "Title and Content required!" });
 
     const scriptId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
@@ -95,10 +92,10 @@ app.post('/api/admin/scripts', (req, res) => {
     );
 });
 
-// 3. ADMIN KEY GENERATOR API (7 Days, 1 Month, 1 Year, Lifetime)
+// Generate VIP Key
 app.post('/api/admin/keys', (req, res) => {
     const { scriptId, durationType, deviceLimit = 1, customKey } = req.body;
-    if (!scriptId) return res.status(400).json({ error: "Script selection is required!" });
+    if (!scriptId) return res.status(400).json({ error: "Please select a script payload!" });
 
     let durationDays = 30;
     if (durationType === '7days') durationDays = 7;
@@ -109,10 +106,10 @@ app.post('/api/admin/keys', (req, res) => {
     const randomHex = () => crypto.randomBytes(2).toString('hex').toUpperCase();
     const keyCode = customKey && customKey.trim() !== "" 
         ? customKey.trim() 
-        : `VIP-${randomHex()}-${randomHex()}-${randomHex()}-${randomHex()}-${randomHex()}`;
+        : `VIP-${randomHex()}-${randomHex()}-${randomHex()}-${randomHex()}`;
 
     db.get(`SELECT key_code FROM keys WHERE key_code = ?`, [keyCode], (err, row) => {
-        if (row) return res.status(400).json({ error: "Key already exists!" });
+        if (row) return res.status(400).json({ error: "Key code already exists!" });
 
         const createdAt = new Date().toISOString();
         db.run(`INSERT INTO keys (key_code, script_id, duration_days, device_limit, created_at, expires_at, is_active) VALUES (?, ?, ?, ?, ?, NULL, 1)`,
@@ -125,27 +122,27 @@ app.post('/api/admin/keys', (req, res) => {
     });
 });
 
-// 4. ADMIN REVOKE KEY API
+// Revoke Key
 app.post('/api/admin/keys/revoke', (req, res) => {
     const { keyCode } = req.body;
-    if (!keyCode) return res.status(400).json({ error: "Key code is required!" });
+    if (!keyCode) return res.status(400).json({ error: "Key code required" });
 
     db.run(`UPDATE keys SET is_active = 0 WHERE key_code = ?`, [keyCode], function(err) {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true, message: "Key has been revoked successfully!" });
+        res.json({ success: true, message: "Key revoked successfully" });
     });
 });
 
-// 5. CLIENT VERIFICATION API
+// Verify License Key & Deliver Payload
 app.post('/api/verify', (req, res) => {
-    const { key, hwid, scriptId } = req.body;
-    if (!key || !hwid) return res.status(400).send("Key and HWID are required");
+    const { key, hwid } = req.body;
+    if (!key || !hwid) {
+        return res.status(400).send("Invalid request payload (Missing Key or HWID)");
+    }
 
     db.get(`SELECT * FROM keys WHERE key_code = ? AND is_active = 1`, [key], (err, keyRecord) => {
-        if (err || !keyRecord) return res.status(401).send("Invalid or revoked license key!");
-
-        if (scriptId && keyRecord.script_id !== scriptId) {
-            return res.status(403).send("Key belongs to a different script!");
+        if (err || !keyRecord) {
+            return res.status(401).send("Invalid or revoked license key!");
         }
 
         const now = new Date();
@@ -163,7 +160,7 @@ app.post('/api/verify', (req, res) => {
         db.all(`SELECT * FROM devices WHERE key_code = ?`, [key], (err, deviceRecords) => {
             if (err) return res.status(500).send("Database error");
 
-            const registeredHwids = deviceRecords.map(d => d.hwid);
+            const registeredHwids = (deviceRecords || []).map(d => d.hwid);
 
             if (!registeredHwids.includes(hwid)) {
                 if (registeredHwids.length >= keyRecord.device_limit) {
@@ -173,7 +170,9 @@ app.post('/api/verify', (req, res) => {
             }
 
             db.get(`SELECT content FROM scripts WHERE id = ?`, [keyRecord.script_id], (err, script) => {
-                if (err || !script) return res.status(404).send("Linked script payload not found!");
+                if (err || !script || !script.content) {
+                    return res.status(404).send("No script payload linked to this key!");
+                }
 
                 res.setHeader('Content-Type', 'text/plain');
                 res.send(script.content);
@@ -182,9 +181,9 @@ app.post('/api/verify', (req, res) => {
     });
 });
 
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running securely on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
