@@ -6,9 +6,9 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-// Increased body limit to allow long Lua script uploads
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+// Increased to 50mb to allow huge Lua script file uploads without errors
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -86,6 +86,60 @@ app.post('/api/admin/keys', (req, res) => {
     const keyCode = customKey && customKey.trim() !== "" 
         ? customKey.trim() 
         : Math.floor(100000 + Math.random() * 900000).toString();
+
+    db.run(`INSERT INTO keys (key_code, script_id, duration_days, device_limit) VALUES (?, ?, ?, ?)`,
+        [keyCode, scriptId, durationDays, deviceLimit],
+        function(err) {
+            if (err) return res.status(500).json({ error: "Key already exists or invalid script selection!" });
+            res.json({ success: true, keyCode });
+        }
+    );
+});
+
+// Client Endpoint: Script & Key Verification
+app.post('/api/verify', (req, res) => {
+    const { key, hwid, scriptId } = req.body;
+    if (!key || !hwid) return res.status(400).json({ status: "error", message: "Key and HWID required" });
+
+    db.get(`SELECT * FROM keys WHERE key_code = ? AND is_active = 1`, [key], (err, keyRecord) => {
+        if (err || !keyRecord) return res.status(401).json({ status: "error", message: "Invalid license key!" });
+
+        if (scriptId && keyRecord.script_id !== scriptId) {
+            return res.status(403).json({ status: "error", message: "This key belongs to a different script!" });
+        }
+
+        if (!keyRecord.expires_at) {
+            const expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + keyRecord.duration_days);
+            db.run(`UPDATE keys SET expires_at = ? WHERE key_code = ?`, [expireDate.toISOString(), key]);
+        } else if (new Date(keyRecord.expires_at) < new Date()) {
+            return res.status(403).json({ status: "error", message: "License key has expired!" });
+        }
+
+        db.all(`SELECT hwid FROM devices WHERE key_code = ?`, [key], (err2, devices) => {
+            const registeredHwids = devices.map(d => d.hwid);
+            if (!registeredHwids.includes(hwid)) {
+                if (registeredHwids.length >= keyRecord.device_limit) {
+                    return res.status(403).json({ status: "error", message: "Device limit reached for this key!" });
+                }
+                db.run(`INSERT INTO devices (key_code, hwid) VALUES (?, ?)`, [key, hwid]);
+            }
+
+            db.get(`SELECT content FROM scripts WHERE id = ?`, [keyRecord.script_id], (err3, script) => {
+                if (err3 || !script) return res.status(404).json({ status: "error", message: "Linked script payload not found!" });
+                res.json({ status: "success", content: script.content });
+            });
+        });
+    });
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Zenitsu & Evil VIP Server running on port ${PORT}`));
+    
 
     db.run(`INSERT INTO keys (key_code, script_id, duration_days, device_limit) VALUES (?, ?, ?, ?)`,
         [keyCode, scriptId, durationDays, deviceLimit],
