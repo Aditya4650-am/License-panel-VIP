@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ ZENITSU VIP - Gamer Edition ⚡</title>
+    <title>⚡ ZENITSU VIP CONTROL PANEL ⚡</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -37,7 +37,6 @@
             position: relative;
         }
 
-        /* 3D Animated Background Canvas */
         #bgCanvas {
             position: fixed;
             top: 0;
@@ -55,7 +54,6 @@
             z-index: 1;
         }
 
-        /* Header & Title Effects */
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -63,7 +61,7 @@
 
         .header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2.3rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -71,12 +69,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
-            animation: pulseGlow 3s infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3)); }
-            100% { filter: drop-shadow(0 0 25px rgba(112, 0, 255, 0.7)); }
         }
 
         .live-clock {
@@ -92,10 +84,9 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
             font-weight: 700;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
         }
 
-        /* Stats Cards - Gamer Style */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -110,25 +101,7 @@
             padding: 20px;
             text-align: center;
             backdrop-filter: blur(12px);
-            position: relative;
-            overflow: hidden;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-            animation: borderSlide 3s infinite linear;
-        }
-
-        @keyframes borderSlide {
-            0% { left: -100%; }
-            100% { left: 100%; }
         }
 
         .stat-card h3 {
@@ -148,7 +121,6 @@
             text-shadow: 0 0 12px var(--neon-cyan);
         }
 
-        /* 3D Glassmorphism Cards */
         .card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -156,12 +128,7 @@
             padding: 25px;
             margin-bottom: 25px;
             backdrop-filter: blur(16px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        }
-
-        .card:hover {
-            border-color: rgba(0, 240, 255, 0.5);
-            box-shadow: 0 20px 45px rgba(0, 240, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         }
 
         .card h2 {
@@ -169,13 +136,9 @@
             font-size: 1.25rem;
             color: var(--neon-cyan);
             margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
             letter-spacing: 1px;
         }
 
-        /* Inputs & Form Controls */
         label {
             display: block;
             font-size: 0.9rem;
@@ -184,7 +147,6 @@
             margin-top: 12px;
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         input[type="text"], input[type="number"], select, textarea {
@@ -200,7 +162,6 @@
             outline: none;
         }
 
-        /* File Upload Drop Zone / Button */
         .file-upload-box {
             border: 2px dashed rgba(0, 240, 255, 0.4);
             background: rgba(5, 8, 17, 0.6);
@@ -209,13 +170,11 @@
             text-align: center;
             margin-bottom: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .file-upload-box:hover {
             border-color: var(--neon-cyan);
             background: rgba(0, 240, 255, 0.08);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
         }
 
         .file-upload-box p {
@@ -225,22 +184,7 @@
             font-weight: 700;
         }
 
-        .file-upload-box span {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            display: block;
-            margin-top: 4px;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-            background: rgba(10, 15, 29, 0.95);
-        }
+        input[type="file"] { display: none; }
 
         textarea {
             height: 120px;
@@ -248,7 +192,6 @@
             resize: vertical;
         }
 
-        /* Buttons */
         .btn {
             width: 100%;
             padding: 14px;
@@ -256,26 +199,19 @@
             font-size: 15px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             background: linear-gradient(135deg, #00f0ff 0%, #7000ff 100%);
             color: #fff;
             box-shadow: 0 6px 20px rgba(0, 240, 255, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(112, 0, 255, 0.5);
-            background: linear-gradient(135deg, #7000ff 0%, #00f0ff 100%);
         }
 
-        /* Table & Action Buttons */
         .table-responsive {
             overflow-x: auto;
             border-radius: 12px;
@@ -300,12 +236,6 @@
             color: var(--neon-cyan);
             font-weight: 700;
             font-size: 12px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        tr:hover {
-            background: rgba(0, 240, 255, 0.03);
         }
 
         code {
@@ -314,8 +244,6 @@
             background: rgba(255, 170, 0, 0.12);
             padding: 4px 8px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 170, 0, 0.25);
-            font-weight: 700;
         }
 
         .badge {
@@ -326,17 +254,8 @@
             font-weight: 700;
         }
 
-        .badge-active { 
-            background: rgba(0, 255, 102, 0.15); 
-            color: var(--neon-green); 
-            border: 1px solid rgba(0, 255, 102, 0.3);
-        }
-
-        .badge-inactive { 
-            background: rgba(255, 42, 95, 0.15); 
-            color: var(--neon-red); 
-            border: 1px solid rgba(255, 42, 95, 0.3);
-        }
+        .badge-active { background: rgba(0, 255, 102, 0.15); color: var(--neon-green); }
+        .badge-inactive { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); }
 
         .btn-action {
             padding: 6px 12px;
@@ -345,37 +264,13 @@
             border-radius: 6px;
             cursor: pointer;
             border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
 
-        .btn-copy {
-            background: rgba(0, 240, 255, 0.15);
-            color: var(--neon-cyan);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-        }
-
-        .btn-copy:hover {
-            background: var(--neon-cyan);
-            color: #000;
-        }
-
-        .btn-revoke {
-            background: rgba(255, 42, 95, 0.15);
-            color: var(--neon-red);
-            border: 1px solid rgba(255, 42, 95, 0.3);
-            margin-left: 5px;
-        }
-
-        .btn-revoke:hover {
-            background: var(--neon-red);
-            color: #fff;
-        }
+        .btn-copy { background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); }
+        .btn-revoke { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); margin-left: 5px; }
 
         @media (max-width: 650px) {
             .stats-grid { grid-template-columns: 1fr; }
-            .header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -394,7 +289,7 @@
                 <p id="totalScripts">0</p>
             </div>
             <div class="stat-card">
-                <h3>🔑 Total Generated Keys</h3>
+                <h3>🔑 Generated Keys</h3>
                 <p id="totalKeys">0</p>
             </div>
             <div class="stat-card">
@@ -403,34 +298,29 @@
             </div>
         </div>
 
-        <!-- Script Payload Upload Card -->
         <div class="card">
-            <h2>🚀 Deploy Script Payload</h2>
+            <h2>🚀 Upload Script Payload</h2>
             
-            <label>Upload Script File From Storage:</label>
+            <label>Select File from Internal Storage:</label>
             <div class="file-upload-box" onclick="document.getElementById('scriptFileInput').click()">
-                <p id="fileStatusText">📁 Click to Select File (.lua / .txt)</p>
-                <span>Browse internal storage / File Manager</span>
+                <p id="fileStatusText">📁 Click to Select Script File (.lua / .txt)</p>
             </div>
             <input type="file" id="scriptFileInput" accept=".lua,.txt,.script" onchange="handleFileSelect(event)">
 
-            <label>Script Details:</label>
             <input type="text" id="scriptTitle" placeholder="Script Title (e.g., Township VIP v4)">
             <input type="text" id="scriptCategory" placeholder="Category" value="Township">
             <input type="text" id="scriptVersion" placeholder="Version" value="4.0">
-            
-            <label>Payload Code Preview / Editor:</label>
-            <textarea id="scriptContent" placeholder="Selected file content will appear here or paste code directly..."></textarea>
+            <textarea id="scriptContent" placeholder="Script payload contents will appear here..."></textarea>
             
             <button class="btn" onclick="uploadScript()">📤 Deploy Script Payload</button>
         </div>
 
         <div class="card">
             <h2>🔑 VIP Access Key Generator</h2>
-            <label>Select Target Script Payload:</label>
+            <label>Target Script Payload:</label>
             <select id="scriptSelect"></select>
             
-            <label>Select Key Duration:</label>
+            <label>Key Duration:</label>
             <select id="durationType">
                 <option value="7days">⚡ 7 Days Access</option>
                 <option value="1month" selected>🔥 1 Month (30 Days)</option>
@@ -439,7 +329,7 @@
             </select>
 
             <label>Device Limit (HWID):</label>
-            <input type="number" id="deviceLimit" placeholder="Device Limit" value="1">
+            <input type="number" id="deviceLimit" value="1">
             
             <label>Custom Key (Optional):</label>
             <input type="text" id="customKey" placeholder="Leave blank for automatic VIP-XXXX generation">
@@ -448,7 +338,7 @@
         </div>
 
         <div class="card">
-            <h2>📊 Active Licenses & Managed Keys</h2>
+            <h2>📊 Active Licenses & Key Database</h2>
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -456,9 +346,9 @@
                             <th>Key Code</th>
                             <th>Linked Script</th>
                             <th>Duration</th>
-                            <th>HWID Limit</th>
+                            <th>Limit</th>
                             <th>Status</th>
-                            <th>Quick Actions</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="keysTableBody"></tbody>
@@ -468,214 +358,123 @@
     </div>
 
     <script>
-        // --- 1. Background Animation ---
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
         const particles = [];
-        for (let i = 0; i < 45; i++) {
+        for (let i = 0; i < 40; i++) {
             particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 2 + 1,
-                dx: (Math.random() - 0.5) * 0.6,
-                dy: (Math.random() - 0.5) * 0.6,
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 1, dx: (Math.random() - 0.5) * 0.5, dy: (Math.random() - 0.5) * 0.5,
                 color: Math.random() > 0.5 ? '#00f0ff' : '#7000ff'
             });
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.x += p.dx;
-                p.y += p.dy;
+            particles.forEach((p, i) => {
+                p.x += p.dx; p.y += p.dy;
                 if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
                 if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = p.color;
-                ctx.fill();
-
-                for (let j = i + 1; j < particles.length; j++) {
-                    let p2 = particles[j];
-                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                    if (dist < 130) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(0, 240, 255, ${1 - dist / 130})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
-                    }
-                }
-            }
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color; ctx.fill();
+            });
             requestAnimationFrame(animateParticles);
         }
         animateParticles();
 
-        // --- 2. Live System Clock ---
         function updateClock() {
-            const now = new Date();
-            document.getElementById('liveClock').innerHTML = "🕒 System Time: " + now.toLocaleString('en-US', { 
-                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
-            });
+            document.getElementById('liveClock').innerText = "🕒 System Time: " + new Date().toLocaleString();
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
 
-        // --- 3. Internal Storage File Reader Handler ---
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             document.getElementById('fileStatusText').innerText = "📄 Selected: " + file.name;
-
-            // Auto-fill title field if empty
-            const titleInput = document.getElementById('scriptTitle');
-            if (!titleInput.value) {
-                titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+            if (!document.getElementById('scriptTitle').value) {
+                document.getElementById('scriptTitle').value = file.name.replace(/\.[^/.]+$/, "");
             }
-
             const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('scriptContent').value = e.target.result;
-                alert("✅ File loaded successfully: " + file.name);
-            };
-            reader.onerror = function() {
-                alert("❌ Error reading file from internal storage.");
-            };
+            reader.onload = e => document.getElementById('scriptContent').value = e.target.result;
             reader.readAsText(file);
         }
 
-        // --- 4. Dashboard Management ---
         async function fetchDashboard() {
             try {
                 const res = await fetch('/api/admin/dashboard');
                 const data = await res.json();
-                
                 document.getElementById('totalScripts').innerText = data.totalScripts;
                 document.getElementById('totalKeys').innerText = data.totalKeys;
                 document.getElementById('activeKeys').innerText = data.activeKeys;
 
                 const select = document.getElementById('scriptSelect');
-                select.innerHTML = '<option value="">Select Target Script</option>';
-                data.scripts.forEach(s => {
-                    select.innerHTML += `<option value="${s.id}">${s.title} (v${s.version})</option>`;
-                });
+                select.innerHTML = '<option value="">Select Script Payload</option>';
+                data.scripts.forEach(s => select.innerHTML += `<option value="${s.id}">${s.title} (v${s.version})</option>`);
 
                 const tbody = document.getElementById('keysTableBody');
                 tbody.innerHTML = '';
                 data.keys.forEach(k => {
-                    let durationText = "⚡ " + k.duration_days + " Days";
-                    if(k.duration_days >= 30000) durationText = "👑 Lifetime";
-                    else if(k.duration_days === 365) durationText = "💎 1 Year";
-                    else if(k.duration_days === 7) durationText = "⚡ 7 Days";
-
-                    const statusBadge = k.is_active 
-                        ? `<span class="badge badge-active">🟢 Active</span>` 
-                        : `<span class="badge badge-inactive">🔴 Revoked</span>`;
-
-                    const revokeBtn = k.is_active 
-                        ? `<button class="btn-action btn-revoke" onclick="revokeKey('${k.key_code}')">🚫 Revoke</button>` 
-                        : `<button class="btn-action" disabled style="opacity:0.35;">Cancelled</button>`;
-
+                    const badge = k.is_active ? `<span class="badge badge-active">🟢 Active</span>` : `<span class="badge badge-inactive">🔴 Revoked</span>`;
+                    const revokeBtn = k.is_active ? `<button class="btn-action btn-revoke" onclick="revokeKey('${k.key_code}')">🚫 Revoke</button>` : '';
                     tbody.innerHTML += `<tr>
                         <td><code>${k.key_code}</code></td>
                         <td>${k.script_name || 'Unlinked'}</td>
-                        <td>${durationText}</td>
+                        <td>${k.duration_days >= 30000 ? '👑 Lifetime' : k.duration_days + ' Days'}</td>
                         <td>${k.device_limit}</td>
-                        <td>${statusBadge}</td>
+                        <td>${badge}</td>
                         <td>
-                            <button class="btn-action btn-copy" onclick="copyKey('${k.key_code}')">📋 Copy</button>
+                            <button class="btn-action btn-copy" onclick="navigator.clipboard.writeText('${k.key_code}')">📋 Copy</button>
                             ${revokeBtn}
                         </td>
                     </tr>`;
                 });
-            } catch (err) {
-                console.error("Error loading dashboard data", err);
-            }
-        }
-
-        function copyKey(key) {
-            navigator.clipboard.writeText(key);
-            alert("📋 Copied Key:\n" + key);
-        }
-
-        async function revokeKey(keyCode) {
-            if(!confirm("Are you sure you want to revoke key:\n" + keyCode + "?")) return;
-
-            const res = await fetch('/api/admin/keys/revoke', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ keyCode })
-            });
-            const data = await res.json();
-            if(data.success) {
-                alert("🚫 Key Revoked Successfully!");
-                fetchDashboard();
-            } else {
-                alert("❌ Error: " + data.error);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function uploadScript() {
             const title = document.getElementById('scriptTitle').value;
-            const category = document.getElementById('scriptCategory').value;
-            const version = document.getElementById('scriptVersion').value;
             const content = document.getElementById('scriptContent').value;
-
-            if(!title || !content) {
-                alert("⚠️ Please select a file or provide a Title and Script Payload content!");
-                return;
-            }
+            if(!title || !content) return alert("⚠️ Please provide Title and Payload Code!");
 
             const res = await fetch('/api/admin/scripts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, category, version, content })
+                body: JSON.stringify({ title, category: document.getElementById('scriptCategory').value, version: document.getElementById('scriptVersion').value, content })
             });
             const data = await res.json();
-            if(data.success) {
-                alert("✅ Script Uploaded Successfully!");
-                document.getElementById('scriptTitle').value = "";
-                document.getElementById('scriptContent').value = "";
-                document.getElementById('fileStatusText').innerText = "📁 Click to Select File (.lua / .txt)";
-                fetchDashboard();
-            } else {
-                alert("❌ Error: " + data.error);
-            }
+            if(data.success) { alert("✅ Script Uploaded!"); fetchDashboard(); }
         }
 
         async function generateKey() {
             const scriptId = document.getElementById('scriptSelect').value;
-            const durationType = document.getElementById('durationType').value;
-            const deviceLimit = document.getElementById('deviceLimit').value;
-            const customKey = document.getElementById('customKey').value;
+            if(!scriptId) return alert("⚠️ Select a Target Script first!");
 
             const res = await fetch('/api/admin/keys', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ scriptId, durationType, deviceLimit, customKey })
+                body: JSON.stringify({
+                    scriptId,
+                    durationType: document.getElementById('durationType').value,
+                    deviceLimit: document.getElementById('deviceLimit').value,
+                    customKey: document.getElementById('customKey').value
+                })
             });
             const data = await res.json();
-            if(data.success) {
-                alert("✨ VIP Key Generated Successfully:\n" + data.keyCode);
-                fetchDashboard();
-            } else {
-                alert("❌ Error: " + data.error);
-            }
+            if(data.success) { alert("✨ Key Generated:\n" + data.keyCode); fetchDashboard(); }
+        }
+
+        async function revokeKey(keyCode) {
+            if(!confirm("Revoke key: " + keyCode + "?")) return;
+            await fetch('/api/admin/keys/revoke', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keyCode })
+            });
+            fetchDashboard();
         }
 
         fetchDashboard();
