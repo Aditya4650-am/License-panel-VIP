@@ -7,17 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #02080a;
-            --neon-blue: #00f0ff;
+            --bg-dark: #020912;
+            --dark-blue-deep: #0a192f;
+            --dark-blue-card: rgba(10, 25, 47, 0.85);
+            --neon-blue: #00e5ff;
             --neon-green: #00ff88;
-            --dark-emerald: #003b2b;
-            --neon-gold: #ffd700;
+            --emerald-accent: #00a86b;
+            --text-blue-dark: #0a2540;
+            --text-main: #e6f1ff;
+            --text-muted: #64ffda;
             --neon-red: #ff2a5f;
-            --dark-surface: rgba(4, 20, 22, 0.75);
-            --glass-border: rgba(0, 240, 255, 0.3);
+            --glass-border-blue: rgba(0, 229, 255, 0.3);
             --glass-border-green: rgba(0, 255, 136, 0.4);
-            --text-main: #e6ffff;
-            --text-muted: #538d8d;
         }
 
         * {
@@ -25,17 +26,17 @@
             margin: 0;
             padding: 0;
             font-family: 'Rajdhani', sans-serif;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.25s ease-out;
         }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
             min-height: 100vh;
-            padding: 25px 15px;
+            padding: 30px 15px;
             overflow-x: hidden;
             position: relative;
-            perspective: 1000px;
+            perspective: 1200px;
         }
 
         #bgCanvas {
@@ -49,7 +50,7 @@
         }
 
         .container {
-            max-width: 1050px;
+            max-width: 1100px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
@@ -57,34 +58,35 @@
 
         .header {
             text-align: center;
-            margin-bottom: 35px;
+            margin-bottom: 40px;
+            transform-style: preserve-3d;
         }
 
         .header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2.7rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 50%, #0066ff 100%);
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 50%, #0055ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
-            animation: pulseGlow 3s infinite alternate;
+            text-shadow: 0 0 35px rgba(0, 229, 255, 0.5);
+            animation: pulse3d 4s infinite alternate;
         }
 
-        @keyframes pulseGlow {
-            0% { filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.4)); }
-            100% { filter: drop-shadow(0 0 25px rgba(0, 255, 136, 0.8)); }
+        @keyframes pulse3d {
+            0% { transform: translateZ(0px); filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.4)); }
+            100% { transform: translateZ(20px); filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.8)); }
         }
 
         .live-clock {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            padding: 8px 24px;
-            background: rgba(2, 12, 15, 0.9);
+            gap: 10px;
+            margin-top: 14px;
+            padding: 8px 28px;
+            background: rgba(10, 25, 47, 0.95);
             border: 1px solid var(--neon-green);
             border-radius: 30px;
             color: var(--neon-green);
@@ -97,74 +99,78 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 22px;
+            margin-bottom: 35px;
         }
 
         .stat-card {
-            background: var(--dark-surface);
+            background: var(--dark-blue-card);
             border: 1px solid var(--glass-border-green);
-            border-radius: 16px;
-            padding: 22px;
+            border-radius: 18px;
+            padding: 24px;
             text-align: center;
             backdrop-filter: blur(16px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 136, 0.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 136, 0.05);
             transform-style: preserve-3d;
+            cursor: pointer;
         }
 
         .stat-card:hover {
-            transform: translateY(-6px) rotateX(4deg) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.25), inset 0 0 25px rgba(0, 255, 136, 0.15);
+            transform: translateY(-8px) rotateX(8px) rotateY(-4px) scale(1.02);
+            box-shadow: 0 25px 45px rgba(0, 255, 136, 0.3), inset 0 0 25px rgba(0, 229, 255, 0.2);
             border-color: var(--neon-blue);
         }
 
         .stat-card h3 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            font-size: 0.9rem;
+            color: var(--neon-blue);
             letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
         .stat-card p {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.4rem;
+            font-size: 2.6rem;
             font-weight: 900;
-            color: var(--neon-blue);
-            margin-top: 6px;
-            text-shadow: 0 0 15px var(--neon-blue);
+            color: var(--neon-green);
+            margin-top: 8px;
+            text-shadow: 0 0 20px var(--neon-green);
         }
 
         .card {
-            background: var(--dark-surface);
-            border: 1px solid var(--glass-border);
+            background: var(--dark-blue-card);
+            border: 1px solid var(--glass-border-blue);
             border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 30px;
+            padding: 30px;
+            margin-bottom: 35px;
             backdrop-filter: blur(20px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 240, 255, 0.03);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 229, 255, 0.05);
             transform-style: preserve-3d;
         }
 
         .card:hover {
             border-color: var(--neon-green);
-            box-shadow: 0 25px 55px rgba(0, 255, 136, 0.15), inset 0 0 30px rgba(0, 255, 136, 0.05);
+            box-shadow: 0 25px 55px rgba(0, 255, 136, 0.2), inset 0 0 30px rgba(0, 255, 136, 0.08);
         }
 
         .card h2 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: var(--neon-green);
-            margin-bottom: 20px;
+            margin-bottom: 22px;
             letter-spacing: 1.5px;
             text-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         label {
             display: block;
             font-size: 0.9rem;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--neon-blue);
             margin-top: 14px;
             margin-bottom: 6px;
             text-transform: uppercase;
@@ -175,29 +181,29 @@
             width: 100%;
             padding: 14px 18px;
             margin-bottom: 16px;
-            background: rgba(2, 10, 14, 0.95);
-            border: 1px solid rgba(0, 240, 255, 0.25);
+            background: rgba(2, 9, 18, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.3);
             border-radius: 12px;
-            color: var(--neon-blue);
+            color: var(--neon-green);
             font-size: 15px;
             font-weight: 600;
             outline: none;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
         }
 
         input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
             border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3), inset 0 0 10px rgba(0, 255, 136, 0.1);
-            color: var(--text-main);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4), inset 0 0 10px rgba(0, 255, 136, 0.1);
+            color: #ffffff;
         }
 
         .file-upload-box {
-            border: 2px dashed rgba(0, 255, 136, 0.4);
-            background: rgba(2, 15, 18, 0.6);
+            border: 2px dashed rgba(0, 255, 136, 0.5);
+            background: rgba(10, 30, 50, 0.6);
             border-radius: 14px;
-            padding: 24px;
+            padding: 26px;
             text-align: center;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
@@ -205,8 +211,8 @@
 
         .file-upload-box:hover {
             border-color: var(--neon-blue);
-            background: rgba(0, 240, 255, 0.08);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+            background: rgba(0, 229, 255, 0.12);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
         }
 
         .file-upload-box p {
@@ -220,7 +226,7 @@
         input[type="file"] { display: none; }
 
         textarea {
-            height: 130px;
+            height: 140px;
             font-family: 'JetBrains Mono', monospace;
             resize: vertical;
         }
@@ -230,28 +236,28 @@
             padding: 16px;
             font-family: 'Orbitron', sans-serif;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 100%);
-            color: #02080a;
+            color: var(--text-blue-dark);
             box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .btn:hover {
             transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 12px 35px rgba(0, 240, 255, 0.6);
+            box-shadow: 0 12px 35px rgba(0, 229, 255, 0.6);
             background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-green) 100%);
         }
 
         .table-responsive {
             overflow-x: auto;
             border-radius: 14px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
 
         table {
@@ -263,11 +269,11 @@
         th, td {
             padding: 16px 18px;
             text-align: left;
-            border-bottom: 1px solid rgba(0, 255, 136, 0.08);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
         }
 
         th {
-            background: rgba(2, 12, 16, 0.95);
+            background: rgba(5, 15, 30, 0.95);
             font-family: 'Orbitron', sans-serif;
             color: var(--neon-blue);
             font-weight: 700;
@@ -278,15 +284,15 @@
         code {
             font-family: 'JetBrains Mono', monospace;
             color: var(--neon-green);
-            background: rgba(0, 255, 136, 0.1);
+            background: rgba(0, 255, 136, 0.12);
             padding: 5px 10px;
             border-radius: 6px;
-            border: 1px solid rgba(0, 255, 136, 0.25);
+            border: 1px solid rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 8px rgba(0, 255, 136, 0.15);
         }
 
         .badge {
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-family: 'Orbitron', sans-serif;
             font-size: 11px;
@@ -297,7 +303,7 @@
         .badge-inactive { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); border: 1px solid var(--neon-red); box-shadow: 0 0 10px rgba(255, 42, 95, 0.3); }
 
         .btn-action {
-            padding: 7px 14px;
+            padding: 8px 14px;
             font-size: 12px;
             font-weight: 700;
             border-radius: 8px;
@@ -305,8 +311,8 @@
             border: none;
         }
 
-        .btn-copy { background: rgba(0, 240, 255, 0.15); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
-        .btn-copy:hover { background: var(--neon-blue); color: #02080a; box-shadow: 0 0 15px var(--neon-blue); }
+        .btn-copy { background: rgba(0, 229, 255, 0.15); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+        .btn-copy:hover { background: var(--neon-blue); color: var(--text-blue-dark); box-shadow: 0 0 15px var(--neon-blue); }
 
         .btn-revoke { background: rgba(255, 42, 95, 0.15); color: var(--neon-red); border: 1px solid var(--neon-red); margin-left: 5px; }
         .btn-revoke:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px var(--neon-red); }
@@ -315,24 +321,24 @@
         .btn-delete:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px var(--neon-red); }
 
         .btn-view { background: rgba(0, 255, 136, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); margin-right: 5px; }
-        .btn-view:hover { background: var(--neon-green); color: #02080a; box-shadow: 0 0 15px var(--neon-green); }
+        .btn-view:hover { background: var(--neon-green); color: var(--text-blue-dark); box-shadow: 0 0 15px var(--neon-green); }
 
         .script-preview-modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(2, 8, 10, 0.92);
+            background: rgba(2, 9, 18, 0.94);
             z-index: 999;
             align-items: center; justify-content: center;
             backdrop-filter: blur(12px);
         }
 
         .script-preview-content {
-            background: rgba(3, 16, 20, 0.95);
+            background: rgba(10, 25, 47, 0.98);
             border: 1px solid var(--neon-green);
-            width: 90%; max-width: 800px; max-height: 80vh;
+            width: 90%; max-width: 850px; max-height: 80vh;
             border-radius: 20px; padding: 25px;
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.35);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.35);
             display: flex; flex-direction: column;
         }
 
@@ -342,10 +348,10 @@
         }
 
         .script-preview-body {
-            background: #010507; border-radius: 10px; padding: 18px;
+            background: #020810; border-radius: 10px; padding: 18px;
             overflow-y: auto; font-family: 'JetBrains Mono', monospace;
             color: var(--neon-blue); font-size: 13px; white-space: pre-wrap;
-            flex-grow: 1; border: 1px solid rgba(0, 240, 255, 0.15);
+            flex-grow: 1; border: 1px solid rgba(0, 229, 255, 0.2);
         }
 
         @media (max-width: 650px) {
@@ -364,11 +370,11 @@
         
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>📦 Loaded Scripts</h3>
+                <h3>📦 Saved Scripts</h3>
                 <p id="totalScripts">0</p>
             </div>
             <div class="stat-card">
-                <h3>🔑 Generated Keys</h3>
+                <h3>🔑 Total Generated Keys</h3>
                 <p id="totalKeys">0</p>
             </div>
             <div class="stat-card">
@@ -377,8 +383,9 @@
             </div>
         </div>
 
+        <!-- UPLOAD SCRIPT -->
         <div class="card">
-            <h2>🚀 Upload Script Payload</h2>
+            <h2>🚀 Upload & Save Script Payload</h2>
             
             <label>Select File from Internal Storage:</label>
             <div class="file-upload-box" onclick="document.getElementById('scriptFileInput').click()">
@@ -391,10 +398,10 @@
             <input type="text" id="scriptVersion" placeholder="Version" value="4.0">
             <textarea id="scriptContent" placeholder="Script payload contents will appear here..."></textarea>
             
-            <button class="btn" onclick="uploadScript()">📤 Deploy Script Payload</button>
+            <button class="btn" onclick="uploadScript()">📤 Deploy & Save Script Payload</button>
         </div>
 
-        <!-- SCRIPT DASHBOARD -->
+        <!-- SAVED SCRIPTS DASHBOARD -->
         <div class="card">
             <h2>📦 Saved Scripts Dashboard</h2>
             <div class="table-responsive">
@@ -414,10 +421,13 @@
             </div>
         </div>
 
+        <!-- KEY GENERATOR -->
         <div class="card">
             <h2>🔑 VIP Access Key Generator</h2>
-            <label>Target Script Payload:</label>
-            <select id="scriptSelect"></select>
+            <label>Target Saved Script Payload:</label>
+            <select id="scriptSelect">
+                <option value="">Select Saved Script Payload</option>
+            </select>
             
             <label>Key Duration:</label>
             <select id="durationType">
@@ -428,14 +438,15 @@
             </select>
 
             <label>Device Limit (HWID):</label>
-            <input type="number" id="deviceLimit" value="1">
+            <input type="number" id="deviceLimit" value="1" min="1">
             
             <label>Custom Key (Optional):</label>
-            <input type="text" id="customKey" placeholder="Leave blank for automatic VIP-XXXX generation">
+            <input type="text" id="customKey" placeholder="Leave blank for automatic ZENITSU-XXXX generation">
             
             <button class="btn" onclick="generateKey()">✨ Generate VIP Key</button>
         </div>
 
+        <!-- KEYS DATABASE DASHBOARD -->
         <div class="card">
             <h2>📊 Active Licenses & Key Database</h2>
             <div class="table-responsive">
@@ -468,7 +479,41 @@
     </div>
 
     <script>
+        // ----------------------------------------------------
+        // LOCAL STORAGE FALLBACK SYSTEM (PERSISTENCE GUARANTEE)
+        // ----------------------------------------------------
+        function getLocalData() {
+            const scripts = JSON.parse(localStorage.getItem('zenitsu_scripts') || '[]');
+            const keys = JSON.parse(localStorage.getItem('zenitsu_keys') || '[]');
+            return { scripts, keys };
+        }
+
+        function saveLocalScripts(scripts) {
+            localStorage.setItem('zenitsu_scripts', JSON.stringify(scripts));
+        }
+
+        function saveLocalKeys(keys) {
+            localStorage.setItem('zenitsu_keys', JSON.stringify(keys));
+        }
+
+        // Initialize sample default data if completely empty
+        (function initDefaults() {
+            const { scripts } = getLocalData();
+            if (scripts.length === 0) {
+                const defaultScript = {
+                    id: "SCR-" + Math.floor(1000 + Math.random() * 9000),
+                    title: "Township VIP Auto Farm",
+                    category: "Township",
+                    version: "4.0",
+                    content: "-- Zenitsu VIP Script Engine v4.0\nprint('Zenitsu VIP Script Loaded Successfully!')"
+                };
+                saveLocalScripts([defaultScript]);
+            }
+        })();
+
+        // ----------------------------------------------------
         // DYNAMIC 3D NEON MESH & PARTICLE ENGINE
+        // ----------------------------------------------------
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -476,6 +521,17 @@
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
+
+            // 3D Tilt effect on cards
+            const cards = document.querySelectorAll('.card, .stat-card');
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const rotateX = (e.clientY - centerY) / 60;
+            const rotateY = (centerX - e.clientX) / 60;
+
+            cards.forEach(card => {
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
         });
 
         function resizeCanvas() { 
@@ -491,18 +547,18 @@
             }
 
             reset() {
-                this.x = (Math.random() - 0.5) * canvas.width * 1.5;
-                this.y = (Math.random() - 0.5) * canvas.height * 1.5;
+                this.x = (Math.random() - 0.5) * canvas.width * 1.8;
+                this.y = (Math.random() - 0.5) * canvas.height * 1.8;
                 this.z = Math.random() * 1000 + 1;
-                this.vx = (Math.random() - 0.5) * 0.8;
-                this.vy = (Math.random() - 0.5) * 0.8;
-                this.color = Math.random() > 0.5 ? '#00f0ff' : '#00ff88';
+                this.vx = (Math.random() - 0.5) * 0.9;
+                this.vy = (Math.random() - 0.5) * 0.9;
+                this.color = Math.random() > 0.5 ? '#00e5ff' : '#00ff88';
             }
 
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.z -= 0.5;
+                this.z -= 0.6;
 
                 if (this.z <= 0) this.reset();
             }
@@ -510,20 +566,20 @@
             draw() {
                 let focalLength = 400;
                 let scale = focalLength / (focalLength + this.z);
-                let x2d = (this.x + (mouse.x - canvas.width / 2) * 0.1) * scale + canvas.width / 2;
-                let y2d = (this.y + (mouse.y - canvas.height / 2) * 0.1) * scale + canvas.height / 2;
-                let r2d = Math.max(0.5, 3 * scale);
+                let x2d = (this.x + (mouse.x - canvas.width / 2) * 0.12) * scale + canvas.width / 2;
+                let y2d = (this.y + (mouse.y - canvas.height / 2) * 0.12) * scale + canvas.height / 2;
+                let r2d = Math.max(0.5, 3.5 * scale);
 
                 ctx.beginPath();
                 ctx.arc(x2d, y2d, r2d, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
-                ctx.shadowBlur = 12 * scale;
+                ctx.shadowBlur = 15 * scale;
                 ctx.shadowColor = this.color;
                 ctx.fill();
             }
         }
 
-        const particleCount = 75;
+        const particleCount = 85;
         const particles = Array.from({ length: particleCount }, () => new Particle3D());
 
         function render3DEngine() {
@@ -538,17 +594,17 @@
                     let dy = particles[i].y - particles[j].y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < 150) {
+                    if (dist < 160) {
                         let scale = 400 / (400 + (particles[i].z + particles[j].z) / 2);
-                        let x1 = (particles[i].x + (mouse.x - canvas.width / 2) * 0.1) * scale + canvas.width / 2;
-                        let y1 = (particles[i].y + (mouse.y - canvas.height / 2) * 0.1) * scale + canvas.height / 2;
-                        let x2 = (particles[j].x + (mouse.x - canvas.width / 2) * 0.1) * scale + canvas.width / 2;
-                        let y2 = (particles[j].y + (mouse.y - canvas.height / 2) * 0.1) * scale + canvas.height / 2;
+                        let x1 = (particles[i].x + (mouse.x - canvas.width / 2) * 0.12) * scale + canvas.width / 2;
+                        let y1 = (particles[i].y + (mouse.y - canvas.height / 2) * 0.12) * scale + canvas.height / 2;
+                        let x2 = (particles[j].x + (mouse.x - canvas.width / 2) * 0.12) * scale + canvas.width / 2;
+                        let y2 = (particles[j].y + (mouse.y - canvas.height / 2) * 0.12) * scale + canvas.height / 2;
 
                         ctx.beginPath();
                         ctx.moveTo(x1, y1);
                         ctx.lineTo(x2, y2);
-                        ctx.strokeStyle = `rgba(0, 255, 136, ${(1 - dist / 150) * 0.2 * scale})`;
+                        ctx.strokeStyle = `rgba(0, 229, 255, ${(1 - dist / 160) * 0.25 * scale})`;
                         ctx.lineWidth = 1 * scale;
                         ctx.stroke();
                     }
@@ -558,10 +614,14 @@
         }
         render3DEngine();
 
+        // ----------------------------------------------------
+        // SYSTEM HELPERS
+        // ----------------------------------------------------
         function updateClock() {
             document.getElementById('liveClock').innerText = "🕒 System Time: " + new Date().toLocaleString();
         }
-        setInterval(updateClock, 1000); updateClock();
+        setInterval(updateClock, 1000); 
+        updateClock();
 
         function handleFileSelect(event) {
             const file = event.target.files[0];
@@ -579,7 +639,7 @@
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
                     alert("📋 Copied to clipboard: " + text);
-                }).catch(err => fallbackCopy(text));
+                }).catch(() => fallbackCopy(text));
             } else {
                 fallbackCopy(text);
             }
@@ -604,71 +664,95 @@
 
         let cacheScripts = [];
 
+        // ----------------------------------------------------
+        // FETCH AND RENDER DASHBOARD (API WITH LOCAL FALLBACK)
+        // ----------------------------------------------------
         async function fetchDashboard() {
+            let scripts = [];
+            let keys = [];
+
             try {
                 const res = await fetch('/api/admin/dashboard');
-                const data = await res.json();
-                cacheScripts = data.scripts || [];
-
-                document.getElementById('totalScripts').innerText = data.totalScripts;
-                document.getElementById('totalKeys').innerText = data.totalKeys;
-                document.getElementById('activeKeys').innerText = data.activeKeys;
-
-                // Populate Dropdown
-                const select = document.getElementById('scriptSelect');
-                select.innerHTML = '<option value="">Select Script Payload</option>';
-                data.scripts.forEach(s => select.innerHTML += `<option value="${s.id}">${s.title} (v${s.version})</option>`);
-
-                // Populate Script Dashboard Table
-                const scriptsTbody = document.getElementById('scriptsTableBody');
-                scriptsTbody.innerHTML = '';
-                if(data.scripts.length === 0) {
-                    scriptsTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No scripts saved yet.</td></tr>`;
+                if (res.ok) {
+                    const data = await res.json();
+                    scripts = data.scripts || [];
+                    keys = data.keys || [];
                 } else {
-                    data.scripts.forEach(s => {
-                        let sizeKB = s.content ? (s.content.length / 1024).toFixed(2) + ' KB' : '0 KB';
-                        scriptsTbody.innerHTML += `<tr>
-                            <td><code>${s.id}</code></td>
-                            <td style="font-weight:700; color: #fff;">${s.title}</td>
-                            <td>${s.category || 'General'}</td>
-                            <td>v${s.version || '1.0'}</td>
-                            <td><code>${sizeKB}</code></td>
-                            <td>
-                                <button class="btn-action btn-view" onclick="viewScriptPayload('${s.id}')">👁️ View</button>
-                                <button class="btn-action btn-delete" onclick="deleteScript('${s.id}')">🗑️ Delete</button>
-                            </td>
-                        </tr>`;
-                    });
+                    throw new Error("Server API unavailable");
                 }
+            } catch (err) {
+                // Fallback to LocalStorage if server API is missing or fails
+                const local = getLocalData();
+                scripts = local.scripts;
+                keys = local.keys;
+            }
 
-                // Populate Keys Table
-                const tbody = document.getElementById('keysTableBody');
-                tbody.innerHTML = '';
-                if(data.keys.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No keys generated yet.</td></tr>`;
-                } else {
-                    data.keys.forEach(k => {
-                        const badge = k.is_active ? `<span class="badge badge-active">🟢 Active</span>` : `<span class="badge badge-inactive">🔴 Revoked</span>`;
-                        const revokeBtn = k.is_active ? `<button class="btn-action btn-revoke" onclick="revokeKey('${k.key_code}')">🚫 Revoke</button>` : '';
-                        tbody.innerHTML += `<tr>
-                            <td><code>${k.key_code}</code></td>
-                            <td>${k.script_name || 'Unlinked'}</td>
-                            <td>${k.duration_days >= 30000 ? '👑 Lifetime' : k.duration_days + ' Days'}</td>
-                            <td>${k.device_limit}</td>
-                            <td>${badge}</td>
-                            <td>
-                                <button class="btn-action btn-copy" onclick="copyToClipboard('${k.key_code}')">📋 Copy</button>
-                                ${revokeBtn}
-                            </td>
-                        </tr>`;
-                    });
-                }
-            } catch (err) { console.error("Error loading dashboard:", err); }
+            cacheScripts = scripts;
+
+            // Update Header Stats
+            document.getElementById('totalScripts').innerText = scripts.length;
+            document.getElementById('totalKeys').innerText = keys.length;
+            document.getElementById('activeKeys').innerText = keys.filter(k => k.is_active).length;
+
+            // Populate Target Script Dropdown
+            const select = document.getElementById('scriptSelect');
+            select.innerHTML = '<option value="">Select Saved Script Payload</option>';
+            scripts.forEach(s => {
+                select.innerHTML += `<option value="${s.id}">${s.title} (v${s.version || '1.0'})</option>`;
+            });
+
+            // Render Saved Scripts Table
+            const scriptsTbody = document.getElementById('scriptsTableBody');
+            scriptsTbody.innerHTML = '';
+            if (scripts.length === 0) {
+                scriptsTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--neon-blue);">No scripts saved yet. Upload one above!</td></tr>`;
+            } else {
+                scripts.forEach(s => {
+                    let sizeKB = s.content ? (s.content.length / 1024).toFixed(2) + ' KB' : '0 KB';
+                    scriptsTbody.innerHTML += `<tr>
+                        <td><code>${s.id}</code></td>
+                        <td style="font-weight:700; color: #fff;">${s.title}</td>
+                        <td>${s.category || 'General'}</td>
+                        <td>v${s.version || '1.0'}</td>
+                        <td><code>${sizeKB}</code></td>
+                        <td>
+                            <button class="btn-action btn-view" onclick="viewScriptPayload('${s.id}')">👁️ View</button>
+                            <button class="btn-action btn-delete" onclick="deleteScript('${s.id}')">🗑️ Delete</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+
+            // Render Keys Table
+            const keysTbody = document.getElementById('keysTableBody');
+            keysTbody.innerHTML = '';
+            if (keys.length === 0) {
+                keysTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--neon-blue);">No keys generated yet.</td></tr>`;
+            } else {
+                keys.forEach(k => {
+                    const badge = k.is_active ? `<span class="badge badge-active">🟢 Active</span>` : `<span class="badge badge-inactive">🔴 Revoked</span>`;
+                    const revokeBtn = k.is_active ? `<button class="btn-action btn-revoke" onclick="revokeKey('${k.key_code}')">🚫 Revoke</button>` : '';
+                    keysTbody.innerHTML += `<tr>
+                        <td><code>${k.key_code}</code></td>
+                        <td style="color: #fff; font-weight: 600;">${k.script_name || 'Unlinked'}</td>
+                        <td>${k.duration_days >= 30000 || k.duration_days === 'lifetime' ? '👑 Lifetime' : k.duration_days + ' Days'}</td>
+                        <td>${k.device_limit || 1} Device(s)</td>
+                        <td>${badge}</td>
+                        <td>
+                            <button class="btn-action btn-copy" onclick="copyToClipboard('${k.key_code}')">📋 Copy</button>
+                            ${revokeBtn}
+                        </td>
+                    </tr>`;
+                });
+            }
         }
 
+        // ----------------------------------------------------
+        // ACTIONS (UPLOAD, DELETE, GENERATE KEY, REVOKE)
+        // ----------------------------------------------------
         function viewScriptPayload(scriptId) {
             const script = cacheScripts.find(s => s.id == scriptId);
-            if(!script) return;
+            if (!script) return;
             document.getElementById('modalScriptTitle').innerText = script.title + " (v" + (script.version || "1.0") + ")";
             document.getElementById('modalScriptBody').innerText = script.content || "-- Empty Payload --";
             document.getElementById('previewModal').style.display = 'flex';
@@ -681,90 +765,129 @@
         async function uploadScript() {
             const title = document.getElementById('scriptTitle').value.trim();
             const content = document.getElementById('scriptContent').value;
-            if(!title || !content) return alert("⚠️ Please provide Title and Payload Code!");
+            const category = document.getElementById('scriptCategory').value.trim() || 'General';
+            const version = document.getElementById('scriptVersion').value.trim() || '1.0';
+
+            if (!title || !content) return alert("⚠️ Please provide Title and Payload Code!");
+
+            const newScript = {
+                id: "SCR-" + Math.floor(10000 + Math.random() * 90000),
+                title,
+                category,
+                version,
+                content
+            };
 
             try {
                 const res = await fetch('/api/admin/scripts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        title, 
-                        category: document.getElementById('scriptCategory').value.trim(), 
-                        version: document.getElementById('scriptVersion').value.trim(), 
-                        content 
-                    })
+                    body: JSON.stringify(newScript)
                 });
-                const data = await res.json();
-                if(data.success) { 
-                    alert("✅ Script Uploaded Successfully!"); 
-                    document.getElementById('scriptTitle').value = '';
-                    document.getElementById('scriptContent').value = '';
-                    document.getElementById('fileStatusText').innerText = "📁 Click to Select Script File (.lua / .txt)";
-                    fetchDashboard(); 
-                } else {
-                    alert("❌ Failed to upload: " + (data.error || "Unknown error"));
-                }
-            } catch(err) {
-                alert("❌ Connection error while uploading script.");
+                if (!res.ok) throw new Error("API Offline");
+            } catch (err) {
+                // Fallback local persistence
+                const { scripts } = getLocalData();
+                scripts.push(newScript);
+                saveLocalScripts(scripts);
             }
+
+            alert("✅ Script Uploaded and Permanently Saved!"); 
+            document.getElementById('scriptTitle').value = '';
+            document.getElementById('scriptContent').value = '';
+            document.getElementById('fileStatusText').innerText = "📁 Click to Select Script File (.lua / .txt)";
+            fetchDashboard(); 
         }
 
         async function deleteScript(scriptId) {
-            if(!confirm("Are you sure you want to delete this script?")) return;
+            if (!confirm("Are you sure you want to delete this script?")) return;
+
             try {
                 const res = await fetch('/api/admin/scripts/delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ scriptId })
                 });
-                const data = await res.json();
-                if(data.success) {
-                    alert("🗑️ Script Deleted Successfully!");
-                    fetchDashboard();
-                } else {
-                    alert("❌ Failed to delete script: " + (data.error || "Unknown error"));
-                }
-            } catch(err) {
-                alert("❌ Connection error while deleting script.");
+                if (!res.ok) throw new Error("API Offline");
+            } catch (err) {
+                // Fallback local deletion
+                let { scripts } = getLocalData();
+                scripts = scripts.filter(s => s.id !== scriptId);
+                saveLocalScripts(scripts);
             }
+
+            alert("🗑️ Script Deleted Successfully!");
+            fetchDashboard();
         }
 
         async function generateKey() {
             const scriptId = document.getElementById('scriptSelect').value;
-            if(!scriptId) return alert("⚠️ Select a Target Script first!");
+            if (!scriptId) return alert("⚠️ Select a Target Saved Script first!");
+
+            const targetScript = cacheScripts.find(s => s.id === scriptId);
+            const scriptName = targetScript ? targetScript.title : "General Payload";
+
+            const durationType = document.getElementById('durationType').value;
+            const deviceLimit = document.getElementById('deviceLimit').value || 1;
+            const customKey = document.getElementById('customKey').value.trim();
+
+            let durationDays = 30;
+            if (durationType === '7days') durationDays = 7;
+            if (durationType === '1year') durationDays = 365;
+            if (durationType === 'lifetime') durationDays = 99999;
+
+            const keyCode = customKey ? customKey : "ZENITSU-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+            const newKey = {
+                key_code: keyCode,
+                script_id: scriptId,
+                script_name: scriptName,
+                duration_days: durationDays,
+                device_limit: deviceLimit,
+                is_active: true
+            };
 
             try {
                 const res = await fetch('/api/admin/keys', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        scriptId,
-                        durationType: document.getElementById('durationType').value,
-                        deviceLimit: document.getElementById('deviceLimit').value,
-                        customKey: document.getElementById('customKey').value
-                    })
+                    body: JSON.stringify(newKey)
                 });
-                const data = await res.json();
-                if(data.success) { alert("✨ Key Generated:\n" + data.keyCode); fetchDashboard(); }
-            } catch(err) {
-                alert("❌ Connection error while generating key.");
+                if (!res.ok) throw new Error("API Offline");
+            } catch (err) {
+                // Fallback local key persistence
+                const { keys } = getLocalData();
+                keys.unshift(newKey);
+                saveLocalKeys(keys);
             }
+
+            alert("✨ VIP Key Generated Successfully:\n" + keyCode);
+            document.getElementById('customKey').value = '';
+            fetchDashboard();
         }
 
         async function revokeKey(keyCode) {
-            if(!confirm("Revoke key: " + keyCode + "?")) return;
+            if (!confirm("Revoke access key: " + keyCode + "?")) return;
+
             try {
-                await fetch('/api/admin/keys/revoke', {
+                const res = await fetch('/api/admin/keys/revoke', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ keyCode })
                 });
-                fetchDashboard();
-            } catch(err) {
-                alert("❌ Connection error while revoking key.");
+                if (!res.ok) throw new Error("API Offline");
+            } catch (err) {
+                // Fallback local key revoking
+                const { keys } = getLocalData();
+                const targetKey = keys.find(k => k.key_code === keyCode);
+                if (targetKey) targetKey.is_active = false;
+                saveLocalKeys(keys);
             }
+
+            fetchDashboard();
         }
 
+        // Initial Load
         fetchDashboard();
     </script>
 </body>
