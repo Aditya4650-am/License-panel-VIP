@@ -1,7 +1,7 @@
 {
   "name": "zenitsu-vip-panel",
   "version": "4.0.0",
-  "description": "ZENITSU VIP Licensing Panel",
+  "description": "ZENITSU VIP Licensing Panel with Persistent Database",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
