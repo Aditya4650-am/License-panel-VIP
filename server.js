@@ -92,6 +92,35 @@ app.post('/api/admin/scripts', (req, res) => {
     );
 });
 
+// Delete Script Endpoint (Added with SQLite cascade cleanup)
+app.post('/api/admin/scripts/delete', (req, res) => {
+    const { scriptId } = req.body;
+    if (!scriptId) return res.status(400).json({ error: "Script ID is required!" });
+
+    db.run(`DELETE FROM scripts WHERE id = ?`, [scriptId], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) {
+            return res.status(404).json({ error: "Script not found!" });
+        }
+
+        // Clean up linked keys and their registered devices
+        db.all(`SELECT key_code FROM keys WHERE script_id = ?`, [scriptId], (err, keys) => {
+            if (!err && keys && keys.length > 0) {
+                const keyCodes = keys.map(k => k.key_code);
+                const placeholders = keyCodes.map(() => '?').join(',');
+
+                // Delete devices attached to keys linked to deleted script
+                db.run(`DELETE FROM devices WHERE key_code IN (${placeholders})`, keyCodes);
+
+                // Delete linked keys
+                db.run(`DELETE FROM keys WHERE script_id = ?`, [scriptId]);
+            }
+        });
+
+        res.json({ success: true, message: "Script and linked data deleted successfully." });
+    });
+});
+
 // Generate VIP Key
 app.post('/api/admin/keys', (req, res) => {
     const { scriptId, durationType, deviceLimit = 1, customKey } = req.body;
