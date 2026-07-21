@@ -1,228 +1,91 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const cors = require('cors');
-const path = require('path');
-const crypto = require('crypto');
-
 const app = express();
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(cors());
-app.use(express.static(path.join(__dirname, 'public')));
 
-const dbFile = path.join(__dirname, 'database.sqlite');
-const db = new sqlite3.Database(dbFile, (err) => {
-    if (err) console.error('Database connection error:', err.message);
-    else {
-        console.log('Connected to SQLite persistent database.');
-        initTables();
-    }
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Disable HTTP caching so GameGuardian never receives stale auth states
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
 });
 
-function initTables() {
-    db.serialize(() => {
-        db.run(`CREATE TABLE IF NOT EXISTS scripts (
-            id TEXT PRIMARY KEY,
-            title TEXT,
-            category TEXT,
-            version TEXT,
-            content TEXT,
-            created_at TEXT
-        )`);
+// Database Store (Replace or connect with your database logic)
+const KEYS_DB = {
+  "VIP-KEY-12345": {
+    expires_at: Math.floor(Date.now() / 1000) + (86400 * 30), // 30 Days
+    bound_device: null,
+    max_devices: 1
+  }
+};
 
-        db.run(`CREATE TABLE IF NOT EXISTS keys (
-            key_code TEXT PRIMARY KEY,
-            script_id TEXT,
-            duration_days INTEGER,
-            device_limit INTEGER,
-            created_at TEXT,
-            expires_at TEXT,
-            is_active INTEGER
-        )`);
-
-        db.run(`CREATE TABLE IF NOT EXISTS devices (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            key_code TEXT,
-            hwid TEXT
-        )`);
-
-        db.run(`CREATE INDEX IF NOT EXISTS idx_keys_code ON keys(key_code)`);
-        db.run(`CREATE INDEX IF NOT EXISTS idx_devices_key ON devices(key_code)`);
-    });
-}
-
-// Anti-cache Headers for Verification Routes
-app.use('/api', (req, res, next) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    next();
+// 1. Connection Probe Route
+app.get('/gg/probe', (req, res) => {
+  res.status(200).send("OK");
 });
 
-// Admin Dashboard Stats
-app.get('/api/admin/dashboard', (req, res) => {
-    db.all(`SELECT * FROM scripts ORDER BY created_at DESC`, [], (err, scripts) => {
-        if (err) return res.status(500).json({ error: err.message });
+// 2. Key Activation Route (Returns Key-Value Format)
+app.post('/gg/activate', (req, res) => {
+  const code = req.body.code;
+  const device = req.body.device;
 
-        db.all(`
-            SELECT k.*, s.title as script_name 
-            FROM keys k 
-            LEFT JOIN scripts s ON k.script_id = s.id 
-            ORDER BY k.created_at DESC
-        `, [], (err, keys) => {
-            if (err) return res.status(500).json({ error: err.message });
+  if (!code || !device) {
+    return res.type("text/plain").send("status=ERROR\nreason=missing_parameters");
+  }
 
-            db.all(`SELECT * FROM devices`, [], (err, devices) => {
-                if (err) return res.status(500).json({ error: err.message });
+  const keyData = KEYS_DB[code];
 
-                res.json({
-                    totalScripts: (scripts || []).length,
-                    totalKeys: (keys || []).length,
-                    activeKeys: (keys || []).filter(k => k.is_active === 1).length,
-                    totalDevices: (devices || []).length,
-                    scripts: scripts || [],
-                    keys: keys || []
-                });
-            });
-        });
-    });
+  if (!keyData) {
+    return res.type("text/plain").send("status=ERROR\nreason=invalid_key");
+  }
+
+  // Check key expiration
+  const currentTime = Math.floor(Date.now() / 1000);
+  if (keyData.expires_at < currentTime) {
+    return res.type("text/plain").send("status=ERROR\nreason=expired");
+  }
+
+  // Device binding check
+  if (keyData.bound_device && keyData.bound_device !== device) {
+    return res.type("text/plain").send("status=ERROR\nreason=device_mismatch");
+  }
+
+  // Bind device on first activation
+  if (!keyData.bound_device) {
+    keyData.bound_device = device;
+  }
+
+  // Return key-value string response expected by loader
+  const ticketUrl = `https://my-vip-panel.onrender.com/gg/payload?token=AUTHORIZED_TOKEN_${code}`;
+  const responseBody = [
+    "status=OK",
+    `ticket_url=${ticketUrl}`,
+    `expires_at=${keyData.expires_at}`,
+    "total_devices=1",
+    "max_devices=1",
+    `client_id=${device}`
+  ].join("\n");
+
+  res.type("text/plain").send(responseBody);
 });
 
-// Upload Script Payload
-app.post('/api/admin/scripts', (req, res) => {
-    const { title, category, version, content } = req.body;
-    if (!title || !content) return res.status(400).json({ error: "Title and Content required!" });
+// 3. Payload Fetch Route
+app.get('/gg/payload', (req, res) => {
+  const token = req.query.token;
 
-    const scriptId = crypto.randomUUID();
-    const createdAt = new Date().toISOString();
+  if (!token || !token.startsWith("AUTHORIZED_TOKEN_")) {
+    return res.status(403).type("text/plain").send("Unauthorized request.");
+  }
 
-    db.run(`INSERT INTO scripts (id, title, category, version, content, created_at) VALUES (?, ?, ?, ?, ?, ?)`,
-        [scriptId, title, category || 'General', version || '1.0.0', content, createdAt],
-        function(err) {
-            if (err) return res.status(500).json({ error: err.message });
-            res.json({ success: true, id: scriptId });
-        }
-    );
-});
+  // Plain Lua payload
+  const luaScript = `
+gg.toast("⚡ VIP Script Loaded Successfully!")
+gg.alert("Welcome to Township VIP Script!")
+  `;
 
-// Delete Script Endpoint
-app.post('/api/admin/scripts/delete', (req, res) => {
-    const { scriptId } = req.body;
-    if (!scriptId) return res.status(400).json({ error: "Script ID is required!" });
-
-    db.run(`DELETE FROM scripts WHERE id = ?`, [scriptId], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "Script not found!" });
-        }
-
-        db.all(`SELECT key_code FROM keys WHERE script_id = ?`, [scriptId], (err, keys) => {
-            if (!err && keys && keys.length > 0) {
-                const keyCodes = keys.map(k => k.key_code);
-                const placeholders = keyCodes.map(() => '?').join(',');
-
-                db.run(`DELETE FROM devices WHERE key_code IN (${placeholders})`, keyCodes);
-                db.run(`DELETE FROM keys WHERE script_id = ?`, [scriptId]);
-            }
-        });
-
-        res.json({ success: true, message: "Script and linked data deleted successfully." });
-    });
-});
-
-// Generate VIP Key
-app.post('/api/admin/keys', (req, res) => {
-    const { scriptId, durationType, deviceLimit = 1, customKey } = req.body;
-    if (!scriptId) return res.status(400).json({ error: "Please select a script payload!" });
-
-    let durationDays = 30;
-    if (durationType === '7days') durationDays = 7;
-    else if (durationType === '1month') durationDays = 30;
-    else if (durationType === '1year') durationDays = 365;
-    else if (durationType === 'lifetime') durationDays = 36500;
-
-    const randomHex = () => crypto.randomBytes(2).toString('hex').toUpperCase();
-    const keyCode = customKey && customKey.trim() !== "" 
-        ? customKey.trim() 
-        : `VIP-${randomHex()}-${randomHex()}-${randomHex()}-${randomHex()}`;
-
-    db.get(`SELECT key_code FROM keys WHERE key_code = ?`, [keyCode], (err, row) => {
-        if (row) return res.status(400).json({ error: "Key code already exists!" });
-
-        const createdAt = new Date().toISOString();
-        db.run(`INSERT INTO keys (key_code, script_id, duration_days, device_limit, created_at, expires_at, is_active) VALUES (?, ?, ?, ?, ?, NULL, 1)`,
-            [keyCode, scriptId, parseInt(durationDays), parseInt(deviceLimit), createdAt],
-            function(err) {
-                if (err) return res.status(500).json({ error: err.message });
-                res.json({ success: true, keyCode });
-            }
-        );
-    });
-});
-
-// Revoke Key
-app.post('/api/admin/keys/revoke', (req, res) => {
-    const { keyCode } = req.body;
-    if (!keyCode) return res.status(400).json({ error: "Key code required" });
-
-    db.run(`UPDATE keys SET is_active = 0 WHERE key_code = ?`, [keyCode], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true, message: "Key revoked successfully" });
-    });
-});
-
-// Key Verification Endpoint
-app.post('/api/verify', (req, res) => {
-    const { key, hwid } = req.body;
-    if (!key || !hwid) {
-        return res.status(400).send("Invalid request payload (Missing Key or HWID)");
-    }
-
-    const cleanKey = key.trim();
-
-    db.get(`SELECT * FROM keys WHERE key_code = ? AND is_active = 1`, [cleanKey], (err, keyRecord) => {
-        if (err || !keyRecord) {
-            return res.status(401).send("Invalid or revoked license key!");
-        }
-
-        const now = new Date();
-        let expiresAt = keyRecord.expires_at;
-
-        if (!expiresAt) {
-            const expireDate = new Date();
-            expireDate.setDate(expireDate.getDate() + keyRecord.duration_days);
-            expiresAt = expireDate.toISOString();
-            db.run(`UPDATE keys SET expires_at = ? WHERE key_code = ?`, [expiresAt, cleanKey]);
-        } else if (new Date(expiresAt) < now) {
-            return res.status(403).send("License key has expired!");
-        }
-
-        db.all(`SELECT hwid FROM devices WHERE key_code = ?`, [cleanKey], (err, deviceRecords) => {
-            if (err) return res.status(500).send("Database error");
-
-            const registeredHwids = (deviceRecords || []).map(d => d.hwid);
-
-            if (!registeredHwids.includes(hwid)) {
-                if (registeredHwids.length >= keyRecord.device_limit) {
-                    return res.status(403).send("Device limit reached for this key!");
-                }
-                db.run(`INSERT INTO devices (key_code, hwid) VALUES (?, ?)`, [cleanKey, hwid]);
-            }
-
-            db.get(`SELECT content FROM scripts WHERE id = ?`, [keyRecord.script_id], (err, script) => {
-                if (err || !script || !script.content) {
-                    return res.status(404).send("No script payload linked to this key!");
-                }
-
-                res.setHeader('Content-Type', 'text/plain');
-                res.send(script.content);
-            });
-        });
-    });
-});
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.type("text/plain").send(luaScript);
 });
 
 const PORT = process.env.PORT || 3000;
