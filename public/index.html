@@ -4,55 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚡ ZENITSU VIP - Gamer Edition ⚡</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <!-- Three.js for true 3D Canvas Background -->
+    <!-- Google Fonts: Syne (Premium Display) & Inter (Clean Professional UI) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Three.js for 3D Background Canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
             --bg-dark: #03050c;
-            --neon-gold: #ffaa00;
-            --neon-amber: #ffd700;
-            --neon-cyan: #00f0ff;
-            --neon-purple: #8000ff;
-            --neon-green: #00ff66;
-            --neon-red: #ff2a5f;
+            --neon-gold: #eab308;
+            --neon-amber: #f59e0b;
+            --neon-green: #16a34a;
+            --neon-red: #dc2626;
             
-            /* Custom Zenitsu Background Image - Ensure 6117533.jpg is in the same directory */
+            /* Custom Zenitsu Background Image */
             --bg-image-url: url('6117533.jpg');
             
-            --glass-bg: rgba(8, 10, 20, 0.72);
-            --glass-border: rgba(255, 170, 0, 0.35);
-            --text-main: #f0f6fc;
-            --text-muted: #a3b3c2;
+            /* High Contrast Solid Glass Panel */
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(234, 179, 8, 0.6);
+            --text-dark-primary: #0f172a;
+            --text-dark-muted: #475569;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Rajdhani', sans-serif;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease-out;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at center, rgba(3, 5, 12, 0.5) 0%, rgba(3, 5, 12, 0.95) 100%),
+                radial-gradient(circle at center, rgba(3, 5, 12, 0.45) 0%, rgba(3, 5, 12, 0.92) 100%),
                 var(--bg-image-url);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: var(--text-main);
+            color: var(--text-dark-primary);
             min-height: 100vh;
-            padding: 30px 15px;
+            padding: 35px 15px;
             overflow-x: hidden;
             position: relative;
         }
 
-        /* 3D Animated Canvas Overlay */
+        /* 3D Animated Canvas Background Overlay */
         #threeCanvas {
             position: fixed;
             top: 0;
@@ -68,7 +67,6 @@
             margin: 0 auto;
             position: relative;
             z-index: 1;
-            perspective: 1200px;
         }
 
         /* Header & Title Effects */
@@ -78,21 +76,21 @@
         }
 
         .header h1 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Syne', sans-serif;
             font-size: 2.8rem;
-            font-weight: 900;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, var(--neon-amber) 0%, var(--neon-gold) 50%, #ffffff 100%);
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #ffffff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 35px rgba(255, 170, 0, 0.6);
+            text-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
             animation: thunderPulse 2.5s infinite alternate;
         }
 
         @keyframes thunderPulse {
-            0% { filter: drop-shadow(0 0 10px rgba(255, 170, 0, 0.4)); }
-            100% { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9)); }
+            0% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
+            100% { filter: drop-shadow(0 0 30px rgba(254, 240, 138, 0.9)); }
         }
 
         .live-clock {
@@ -101,15 +99,15 @@
             gap: 8px;
             margin-top: 14px;
             padding: 8px 22px;
-            background: rgba(5, 8, 17, 0.85);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid var(--neon-gold);
             border-radius: 30px;
-            color: var(--neon-amber);
+            color: #fef08a;
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
             font-weight: 700;
             backdrop-filter: blur(12px);
-            box-shadow: 0 0 20px rgba(255, 170, 0, 0.25), inset 0 0 10px rgba(255, 170, 0, 0.15);
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.25);
         }
 
         /* Stats Cards */
@@ -130,8 +128,7 @@
             -webkit-backdrop-filter: blur(16px);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            transform-style: preserve-3d;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .stat-card::before {
@@ -140,7 +137,7 @@
             top: 0;
             left: -100%;
             width: 100%;
-            height: 2px;
+            height: 3px;
             background: linear-gradient(90deg, transparent, var(--neon-amber), transparent);
             animation: borderSlide 2.5s infinite linear;
         }
@@ -151,23 +148,23 @@
         }
 
         .stat-card h3 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Syne', sans-serif;
             font-size: 0.85rem;
-            color: var(--text-muted);
-            letter-spacing: 1.5px;
+            color: var(--text-dark-muted);
+            letter-spacing: 1px;
             text-transform: uppercase;
+            font-weight: 700;
         }
 
         .stat-card p {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.4rem;
-            font-weight: 900;
-            color: #fff;
-            margin-top: 6px;
-            text-shadow: 0 0 15px var(--neon-gold);
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-dark-primary);
+            margin-top: 4px;
         }
 
-        /* 3D Dynamic Interactive Cards */
+        /* Fixed Flat Panels (Tilt Feature Turned Off) */
         .card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -176,58 +173,55 @@
             margin-bottom: 30px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-            transform-style: preserve-3d;
-            will-change: transform;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
 
         .card:hover {
-            border-color: rgba(255, 215, 0, 0.7);
-            box-shadow: 0 25px 50px rgba(255, 170, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: #f59e0b;
+            box-shadow: 0 20px 45px rgba(245, 158, 11, 0.25);
         }
 
         .card h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.35rem;
-            color: var(--neon-amber);
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            color: #b45309;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 12px rgba(255, 170, 0, 0.4);
+            letter-spacing: 0.5px;
+            font-weight: 800;
         }
 
-        /* Form Controls */
+        /* Form Controls with Dark Fonts */
         label {
             display: block;
             font-size: 0.85rem;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--text-dark-muted);
             margin-top: 14px;
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
 
         input, select, textarea {
             width: 100%;
             padding: 14px 18px;
             margin-bottom: 16px;
-            background: rgba(5, 8, 17, 0.85);
-            border: 1px solid rgba(255, 170, 0, 0.3);
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
             border-radius: 12px;
-            color: #fff;
+            color: var(--text-dark-primary);
             font-size: 15px;
             font-weight: 600;
             outline: none;
-            backdrop-filter: blur(5px);
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: var(--neon-amber);
-            box-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
-            background: rgba(10, 15, 29, 0.95);
+            border-color: #d97706;
+            box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+            background: #ffffff;
         }
 
         textarea {
@@ -236,23 +230,21 @@
             resize: vertical;
         }
 
-        /* 3D Action Buttons */
+        /* Action Buttons */
         .btn {
             width: 100%;
             padding: 16px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Syne', sans-serif;
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--neon-amber) 0%, #d97706 100%);
-            color: #000;
-            box-shadow: 0 8px 25px rgba(255, 170, 0, 0.4);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+            color: #ffffff;
+            box-shadow: 0 8px 25px rgba(180, 83, 9, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -260,21 +252,16 @@
         }
 
         .btn:hover {
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.6);
-            background: linear-gradient(135deg, #f59e0b 0%, var(--neon-amber) 100%);
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.45);
         }
 
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        /* Table & Action Badges */
+        /* Table & Badges with High Contrast Dark Fonts */
         .table-responsive {
             overflow-x: auto;
             border-radius: 14px;
-            border: 1px solid rgba(255, 170, 0, 0.25);
-            background: rgba(3, 5, 12, 0.7);
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
         }
 
         table {
@@ -286,52 +273,54 @@
         th, td {
             padding: 16px 18px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--text-dark-primary);
+            font-weight: 600;
         }
 
         th {
-            background: rgba(5, 8, 17, 0.95);
-            font-family: 'Orbitron', sans-serif;
-            color: var(--neon-amber);
-            font-weight: 700;
+            background: #f8fafc;
+            font-family: 'Syne', sans-serif;
+            color: #b45309;
+            font-weight: 800;
             font-size: 12px;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
 
         tr:hover {
-            background: rgba(255, 170, 0, 0.05);
+            background: #f1f5f9;
         }
 
         code {
             font-family: 'JetBrains Mono', monospace;
-            color: var(--neon-amber);
-            background: rgba(255, 215, 0, 0.12);
+            color: #b45309;
+            background: #fef3c7;
             padding: 4px 10px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 215, 0, 0.35);
+            border: 1px solid #fde68a;
             font-weight: 700;
         }
 
         .badge {
             padding: 5px 12px;
             border-radius: 20px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Syne', sans-serif;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 0.5px;
         }
 
         .badge-active { 
-            background: rgba(0, 255, 102, 0.15); 
-            color: var(--neon-green); 
-            border: 1px solid rgba(0, 255, 102, 0.4);
+            background: #dcfce7; 
+            color: #15803d; 
+            border: 1px solid #bbf7d0;
         }
 
         .badge-inactive { 
-            background: rgba(255, 42, 95, 0.15); 
-            color: var(--neon-red); 
-            border: 1px solid rgba(255, 42, 95, 0.4);
+            background: #fee2e2; 
+            color: #b91c1c; 
+            border: 1px solid #fecaca;
         }
 
         .btn-action {
@@ -347,28 +336,26 @@
         }
 
         .btn-copy {
-            background: rgba(255, 170, 0, 0.15);
-            color: var(--neon-amber);
-            border: 1px solid rgba(255, 170, 0, 0.35);
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
         }
 
         .btn-copy:hover {
-            background: var(--neon-amber);
-            color: #000;
-            box-shadow: 0 0 15px var(--neon-amber);
+            background: #f59e0b;
+            color: #ffffff;
         }
 
         .btn-revoke {
-            background: rgba(255, 42, 95, 0.15);
-            color: var(--neon-red);
-            border: 1px solid rgba(255, 42, 95, 0.3);
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
             margin-left: 6px;
         }
 
         .btn-revoke:hover {
-            background: var(--neon-red);
-            color: #fff;
-            box-shadow: 0 0 15px var(--neon-red);
+            background: #dc2626;
+            color: #ffffff;
         }
 
         @media (max-width: 768px) {
@@ -389,21 +376,21 @@
         </div>
         
         <div class="stats-grid">
-            <div class="stat-card tilt-card">
+            <div class="stat-card">
                 <h3>📦 Loaded Scripts</h3>
                 <p id="totalScripts">0</p>
             </div>
-            <div class="stat-card tilt-card">
+            <div class="stat-card">
                 <h3>🔑 Total Generated Keys</h3>
                 <p id="totalKeys">0</p>
             </div>
-            <div class="stat-card tilt-card">
+            <div class="stat-card">
                 <h3>🟢 Active Licenses</h3>
                 <p id="activeKeys">0</p>
             </div>
         </div>
 
-        <div class="card tilt-card">
+        <div class="card">
             <h2>🚀 Deploy Script Payload</h2>
             <input type="text" id="scriptTitle" placeholder="Script Title (e.g., Township Elite v4)">
             <input type="text" id="scriptCategory" placeholder="Category" value="Township">
@@ -412,7 +399,7 @@
             <button class="btn" onclick="uploadScript()">📤 Deploy Script Payload</button>
         </div>
 
-        <div class="card tilt-card">
+        <div class="card">
             <h2>🔑 VIP Access Key Generator</h2>
             <label>Select Target Script Payload:</label>
             <select id="scriptSelect"></select>
@@ -434,7 +421,7 @@
             <button class="btn" onclick="generateKey()">✨ Generate VIP Key</button>
         </div>
 
-        <div class="card tilt-card">
+        <div class="card">
             <h2>📊 Active Licenses & Managed Keys</h2>
             <div class="table-responsive">
                 <table>
@@ -455,7 +442,7 @@
     </div>
 
     <script>
-        // --- 1. True 3D Floating Geometry Background (Three.js) ---
+        // --- 1. Ambient 3D Background Objects (Three.js) ---
         const container = document.getElementById('threeCanvas');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -474,10 +461,10 @@
         for (let i = 0; i < 16; i++) {
             const geom = geometries[Math.floor(Math.random() * geometries.length)];
             const material = new THREE.MeshBasicMaterial({
-                color: i % 2 === 0 ? 0xffaa00 : 0xffd700,
+                color: i % 2 === 0 ? 0xeab308 : 0xf59e0b,
                 wireframe: true,
                 transparent: true,
-                opacity: 0.25
+                opacity: 0.22
             });
             const mesh = new THREE.Mesh(geom, material);
             mesh.position.set(
@@ -485,8 +472,8 @@
                 (Math.random() - 0.5) * 20,
                 (Math.random() - 0.5) * 15
             );
-            mesh.rotSpeedX = (Math.random() - 0.5) * 0.012;
-            mesh.rotSpeedY = (Math.random() - 0.5) * 0.012;
+            mesh.rotSpeedX = (Math.random() - 0.5) * 0.01;
+            mesh.rotSpeedY = (Math.random() - 0.5) * 0.01;
             scene.add(mesh);
             shapes.push(mesh);
         }
@@ -509,29 +496,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // --- 2. Interactive 3D Card Tilt Effect ---
-        const tiltCards = document.querySelectorAll('.tilt-card');
-        tiltCards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = ((y - centerY) / centerY) * -7;
-                const rotateY = ((x - centerX) / centerX) * 7;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(8px)`;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
-            });
-        });
-
-        // --- 3. Live System Clock ---
+        // --- 2. Live System Clock ---
         function updateClock() {
             const now = new Date();
             const options = { 
@@ -549,7 +514,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- 4. Dashboard API Fetching & Management ---
+        // --- 3. Dashboard API Fetching & Management ---
         async function fetchDashboard() {
             try {
                 const res = await fetch('/api/admin/dashboard');
