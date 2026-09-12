@@ -3,7 +3,7 @@
 A high-performance, full-stack license management and activation system engineered for modern web applications, SaaS platforms, and software distribution control. **License Panel VIP** provides a secure administrative dashboard, client key verification API, and interactive control panel.
 
 ---
-
+## DEVELOPED BY AM TECH.
 ## ✨ Features
 
 - 🔑 **License Key Generation & Management**: Create, extend, revoke, and inspect multi-tier activation keys with custom expiration dates and dynamic seat limits.
@@ -97,3 +97,4 @@ Once running, access the dashboard at: **`http://localhost:3000`**
 ## 📜 License
 
 This project is released under the **MIT License**. Feel free to modify and distribute according to the license terms.
+## ZENITSU491
